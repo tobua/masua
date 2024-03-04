@@ -1,0 +1,21 @@
+{
+  "papua": {
+    "title": "masua - Masonry Grid",
+    "icon": "../logo.png"
+  },
+  "dependencies": {
+    "@types/react": "^18.2.62",
+    "@types/react-dom": "^18.2.19",
+    "optica": "^2.1.0",
+    "papua": "^5.9.7",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "sugar-high": "^0.6.0"
+  },
+  "localDependencies": {
+    "masua": ".."
+  },
+  "trustedDependencies": [
+    "papua"
+  ]
+}

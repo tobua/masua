@@ -1,0 +1,65 @@
+{
+  "name": "masua",
+  "description": "Simple masonry layout in TypeScript.",
+  "version": "0.0.0-development",
+  "repository": "github:tobua/masua",
+  "homepage": "https://tobua.github.io/masua",
+  "license": "MIT",
+  "author": "Matthias Giger",
+  "contributors": [
+    "Spope (minimasonry)"
+  ],
+  "scripts": {
+    "build": "padua build",
+    "start": "padua watch"
+  },
+  "devDependencies": {
+    "@types/react": "^18.2.56",
+    "padua": "latest"
+  },
+  "peerDependencies": {
+    "react": ">= 18"
+  },
+  "peerDependenciesMeta": {
+    "react": {
+      "optional": true
+    }
+  },
+  "trustedDependencies": [
+    "padua"
+  ],
+  "type": "module",
+  "sideEffects": false,
+  "main": "./index.ts",
+  "exports": {
+    ".": {
+      "default": "./index.ts"
+    },
+    "./react": {
+      "default": "./react.tsx"
+    }
+  },
+  "files": [
+    "index.ts",
+    "react.tsx"
+  ],
+  "keywords": [
+    "masonry",
+    "staggered",
+    "grid",
+    "pinterest",
+    "layout",
+    "react",
+    "typescript"
+  ],
+  "prettier": "padua/configuration/.prettierrc.json",
+  "eslintConfig": {
+    "extends": "./node_modules/padua/configuration/eslint.cjs"
+  },
+  "publishConfig": {
+    "provenance": false
+  },
+  "engines": {
+    "node": ">= 18"
+  }
+}
