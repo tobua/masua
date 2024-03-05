@@ -1,6 +1,6 @@
 {
   "name": "masua",
-  "description": "Simple masonry layout in TypeScript.",
+  "description": "Simple masonry layout library in TypeScript.",
   "version": "0.0.0-development",
   "repository": "github:tobua/masua",
   "homepage": "https://tobua.github.io/masua",

@@ -6,6 +6,11 @@ import { grid } from 'masua'
 import { Grid } from 'masua/react'
 import logo from './logo.png'
 
+if ('paintWorklet' in CSS) {
+  // Script loaded separately from /public folder after initial load.
+  ;(CSS as any).paintWorklet.addModule('squircle.min.js')
+}
+
 document.body.style.display = 'flex'
 document.body.style.justifyContent = 'center'
 document.body.style.margin = '0'
@@ -73,17 +78,23 @@ function Code({ children }: { children: string }) {
 
 let colorIndex = 0
 
+const boxStyles = (size: number, sizeFactor = 40): CSSProperties => {
+  const color = Color.boxes[colorIndex++ % 6]
+
+  return {
+    position: 'absolute',
+    width: scale(100),
+    height: scale(size * sizeFactor),
+    background: 'paintWorklet' in CSS ? 'paint(squircle)' : color,
+    borderRadius: 'paintWorklet' in CSS ? 0 : scale(10),
+    // @ts-ignore
+    '--squircle-radius': sizeFactor / 2,
+    '--squircle-fill': color,
+  }
+}
+
 function Box({ size = 1 }) {
-  return (
-    <div
-      style={{
-        position: 'absolute',
-        background: Color.boxes[colorIndex++ % 6],
-        width: scale(100),
-        height: scale(size * 20),
-      }}
-    />
-  )
+  return <div style={boxStyles(size)} />
 }
 
 function App() {
