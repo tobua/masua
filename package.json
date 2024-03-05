@@ -13,8 +13,16 @@
     "build": "padua build",
     "start": "padua watch"
   },
+  "padua": {
+    "tsconfig": {
+      "include": [
+        "index.ts",
+        "react.tsx"
+      ]
+    }
+  },
   "devDependencies": {
-    "@types/react": "^18.2.56",
+    "@types/react": "^18.2.63",
     "padua": "latest"
   },
   "peerDependencies": {

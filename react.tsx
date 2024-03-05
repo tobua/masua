@@ -4,7 +4,9 @@ import { grid } from 'masua'
 export function Grid({ ...props }: JSX.IntrinsicElements['div']) {
   const gridRef = useRef(null)
 
-  useEffect(() => grid(gridRef.current), [])
+  useEffect(() => {
+    return grid(gridRef.current).destroy
+  }, [])
 
   return <div ref={gridRef} {...props} />
 }

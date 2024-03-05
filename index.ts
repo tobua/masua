@@ -1,256 +1,269 @@
-const MiniMasonry = function (conf) {
-  this._sizes = []
-  this._columns = []
-  this._container = null
-  this._count = null
-  this._width = 0
-  this._removeListener = null
-  this._currentGutterX = null
-  this._currentGutterY = null
-  ;(this._resizeTimeout = null),
-    (this.conf = {
-      baseWidth: 255,
-      gutterX: null,
-      gutterY: null,
-      gutter: 10,
-      container: null,
-      minify: true,
-      ultimateGutter: 5,
-      surroundingGutter: true,
-      direction: 'ltr',
-      wedge: false,
-    })
-
-  this.init(conf)
-
-  return this
+interface Configuration {
+  sizes: number[]
+  columns: number[]
+  container: HTMLElement
+  count: number
+  width: number
+  removeListener: () => void
+  currentGutterX: number
+  currentGutterY: number
+  resizeTimeout: NodeJS.Timeout
+  baseWidth: number
+  gutterX: number
+  gutterY: number
+  gutter: number
+  minify: boolean
+  ultimateGutter: number
+  surroundingGutter: boolean
+  direction: 'ltr' | 'rtl'
+  wedge: boolean
 }
 
-MiniMasonry.prototype.init = function (conf) {
-  for (const i in this.conf) {
-    if (conf[i] != undefined) {
-      this.conf[i] = conf[i]
-    }
-  }
-
-  if (this.conf.gutterX == null || this.conf.gutterY == null) {
-    this.conf.gutterX = this.conf.gutterY = this.conf.gutter
-  }
-  this._currentGutterX = this.conf.gutterX
-  this._currentGutterY = this.conf.gutterY
-
-  this._container =
-    typeof this.conf.container === 'object' && this.conf.container.nodeName
-      ? this.conf.container
-      : document.querySelector(this.conf.container)
-
-  if (!this._container) {
-    throw new Error('Container not found or missing')
-  }
-
-  const onResize = this.resizeThrottler.bind(this)
-  window.addEventListener('resize', onResize)
-  this._removeListener = function () {
-    window.removeEventListener('resize', onResize)
-    if (this._resizeTimeout != null) {
-      window.clearTimeout(this._resizeTimeout)
-      this._resizeTimeout = null
-    }
-  }
-
-  this.layout()
-}
-
-MiniMasonry.prototype.reset = function () {
-  this._sizes = []
-  this._columns = []
-  this._count = null
-  this._width = this._container.clientWidth
-  const minWidth = this.conf.baseWidth
-  if (this._width < minWidth) {
-    this._width = minWidth
-    this._container.style.minWidth = `${minWidth}px`
-  }
-
-  if (this.getCount() == 1) {
-    // Set ultimate gutter when only one column is displayed
-    this._currentGutterX = this.conf.ultimateGutter
-    // As gutters are reduced, two column may fit, forcing to 1
-    this._count = 1
-  } else if (this._width < this.conf.baseWidth + 2 * this._currentGutterX) {
-    // Remove gutter when screen is to low
-    this._currentGutterX = 0
-  } else {
-    this._currentGutterX = this.conf.gutterX
-  }
-}
-
-MiniMasonry.prototype.getCount = function () {
-  if (this.conf.surroundingGutter) {
+function getCount(configuration: Configuration) {
+  if (configuration.surroundingGutter) {
     return Math.floor(
-      (this._width - this._currentGutterX) / (this.conf.baseWidth + this._currentGutterX),
+      (configuration.width - configuration.currentGutterX) /
+        (configuration.baseWidth + configuration.currentGutterX),
     )
   }
 
   return Math.floor(
-    (this._width + this._currentGutterX) / (this.conf.baseWidth + this._currentGutterX),
+    (configuration.width + configuration.currentGutterX) /
+      (configuration.baseWidth + configuration.currentGutterX),
   )
 }
 
-MiniMasonry.prototype.computeWidth = function () {
-  let width
-  if (this.conf.surroundingGutter) {
-    width = (this._width - this._currentGutterX) / this._count - this._currentGutterX
-  } else {
-    width = (this._width + this._currentGutterX) / this._count - this._currentGutterX
-  }
-  width = Number.parseFloat(width.toFixed(2))
-
-  return width
-}
-
-MiniMasonry.prototype.layout = function () {
-  if (!this._container) {
-    console.error('Container not found')
-    return
-  }
-  this.reset()
-
-  // Computing columns count
-  if (this._count == null) {
-    this._count = this.getCount()
-  }
-  // Computing columns width
-  const colWidth = this.computeWidth()
-
-  for (let i = 0; i < this._count; i++) {
-    this._columns[i] = 0
-  }
-
-  // Saving children real heights
-  const { children } = this._container
-  for (let k = 0; k < children.length; k++) {
-    // Set colWidth before retrieving element height if content is proportional
-    children[k].style.width = `${colWidth}px`
-    this._sizes[k] = children[k].clientHeight
-  }
-
-  let startX
-  if (this.conf.direction == 'ltr') {
-    startX = this.conf.surroundingGutter ? this._currentGutterX : 0
-  } else {
-    startX = this._width - (this.conf.surroundingGutter ? this._currentGutterX : 0)
-  }
-  if (this._count > this._sizes.length) {
-    // If more columns than children
-    const occupiedSpace =
-      this._sizes.length * (colWidth + this._currentGutterX) - this._currentGutterX
-    if (this.conf.wedge === false) {
-      if (this.conf.direction == 'ltr') {
-        startX = (this._width - occupiedSpace) / 2
-      } else {
-        startX = this._width - (this._width - occupiedSpace) / 2
-      }
-    } else if (this.conf.direction == 'ltr') {
-      //
-    } else {
-      startX = this._width - this._currentGutterX
+function getLongest(configuration: Configuration) {
+  let longest = 0
+  for (let index = 0; index < configuration.count; index += 1) {
+    if (configuration.columns[index] > configuration.columns[longest]) {
+      longest = index
     }
   }
-
-  // Computing position of children
-  for (let index = 0; index < children.length; index++) {
-    const nextColumn = this.conf.minify ? this.getShortest() : this.getNextColumn(index)
-
-    let childrenGutter = 0
-    if (this.conf.surroundingGutter || nextColumn != this._columns.length) {
-      childrenGutter = this._currentGutterX
-    }
-    var x
-    if (this.conf.direction == 'ltr') {
-      x = startX + (colWidth + childrenGutter) * nextColumn
-    } else {
-      x = startX - (colWidth + childrenGutter) * nextColumn - colWidth
-    }
-    const y = this._columns[nextColumn]
-
-    children[index].style.transform = `translate3d(${Math.round(x)}px,${Math.round(y)}px,0)`
-
-    this._columns[nextColumn] +=
-      this._sizes[index] + (this._count > 1 ? this.conf.gutterY : this.conf.ultimateGutter) // margin-bottom
-  }
-
-  this._container.style.height = `${this._columns[this.getLongest()] - this._currentGutterY}px`
+  return longest
 }
 
-MiniMasonry.prototype.getNextColumn = function (index) {
-  return index % this._columns.length
+function getNextColumn(index: number, configuration: Configuration) {
+  return index % configuration.columns.length
 }
 
-MiniMasonry.prototype.getShortest = function () {
+function getShortest(configuration: Configuration) {
   let shortest = 0
-  for (let i = 0; i < this._count; i++) {
-    if (this._columns[i] < this._columns[shortest]) {
-      shortest = i
+  for (let index = 0; index < configuration.count; index += 1) {
+    if (configuration.columns[index] < configuration.columns[shortest]) {
+      shortest = index
     }
   }
 
   return shortest
 }
 
-MiniMasonry.prototype.getLongest = function () {
-  let longest = 0
-  for (let i = 0; i < this._count; i++) {
-    if (this._columns[i] > this._columns[longest]) {
-      longest = i
+function reset(configuration: Configuration) {
+  configuration.sizes = []
+  configuration.columns = []
+  configuration.count = null
+  configuration.width = configuration.container.clientWidth
+  const minWidth = configuration.baseWidth
+  if (configuration.width < minWidth) {
+    configuration.width = minWidth
+    configuration.container.style.minWidth = `${minWidth}px`
+  }
+
+  if (getCount(configuration) === 1) {
+    // Set ultimate gutter when only one column is displayed
+    configuration.currentGutterX = configuration.ultimateGutter
+    // As gutters are reduced, two column may fit, forcing to 1
+    configuration.count = 1
+  } else if (configuration.width < configuration.baseWidth + 2 * configuration.currentGutterX) {
+    // Remove gutter when screen is to low
+    configuration.currentGutterX = 0
+  } else {
+    configuration.currentGutterX = configuration.gutterX
+  }
+}
+
+function computeWidth(configuration: Configuration) {
+  let width
+  if (configuration.surroundingGutter) {
+    width =
+      (configuration.width - configuration.currentGutterX) / configuration.count -
+      configuration.currentGutterX
+  } else {
+    width =
+      (configuration.width + configuration.currentGutterX) / configuration.count -
+      configuration.currentGutterX
+  }
+  width = Number.parseFloat(width.toFixed(2))
+
+  return width
+}
+
+function layout(configuration: Configuration) {
+  if (!configuration.container) {
+    console.error('Container not found')
+    return
+  }
+  reset(configuration)
+
+  // Computing columns count
+  if (configuration.count == null) {
+    configuration.count = getCount(configuration)
+  }
+  // Computing columns width
+  const colWidth = computeWidth(configuration)
+
+  for (let index = 0; index < configuration.count; index += 1) {
+    configuration.columns[index] = 0
+  }
+
+  // Saving children real heights
+  const { children } = configuration.container
+  for (let index = 0; index < children.length; index += 1) {
+    // Set colWidth before retrieving element height if content is proportional
+    const child = children[index] as HTMLElement
+    child.style.width = `${colWidth}px`
+    configuration.sizes[index] = child.clientHeight
+  }
+
+  let startX
+  if (configuration.direction === 'ltr') {
+    startX = configuration.surroundingGutter ? configuration.currentGutterX : 0
+  } else {
+    startX =
+      configuration.width - (configuration.surroundingGutter ? configuration.currentGutterX : 0)
+  }
+  if (configuration.count > configuration.sizes.length) {
+    // If more columns than children
+    const occupiedSpace =
+      configuration.sizes.length * (colWidth + configuration.currentGutterX) -
+      configuration.currentGutterX
+    if (configuration.wedge === false) {
+      if (configuration.direction === 'ltr') {
+        startX = (configuration.width - occupiedSpace) / 2
+      } else {
+        startX = configuration.width - (configuration.width - occupiedSpace) / 2
+      }
+    } else if (configuration.direction === 'ltr') {
+      //
+    } else {
+      startX = configuration.width - configuration.currentGutterX
     }
   }
 
-  return longest
+  // Computing position of children
+  for (let index = 0; index < children.length; index += 1) {
+    const nextColumn = configuration.minify
+      ? getShortest(configuration)
+      : getNextColumn(index, configuration)
+
+    let childrenGutter = 0
+    if (configuration.surroundingGutter || nextColumn !== configuration.columns.length) {
+      childrenGutter = configuration.currentGutterX
+    }
+    let x: number
+    if (configuration.direction === 'ltr') {
+      x = startX + (colWidth + childrenGutter) * nextColumn
+    } else {
+      x = startX - (colWidth + childrenGutter) * nextColumn - colWidth
+    }
+    const y = configuration.columns[nextColumn]
+    const child = children[index] as HTMLElement
+    child.style.transform = `translate3d(${Math.round(x)}px,${Math.round(y)}px,0)`
+
+    configuration.columns[nextColumn] +=
+      configuration.sizes[index] +
+      (configuration.count > 1 ? configuration.gutterY : configuration.ultimateGutter) // margin-bottom
+  }
+
+  configuration.container.style.height = `${configuration.columns[getLongest(configuration)] - configuration.currentGutterY}px`
 }
 
-MiniMasonry.prototype.resizeThrottler = function () {
+function resizeThrottler(configuration: Configuration) {
   // ignore resize events as long as an actualResizeHandler execution is in the queue
-  if (!this._resizeTimeout) {
-    this._resizeTimeout = setTimeout(() => {
-      this._resizeTimeout = null
+  if (!configuration.resizeTimeout) {
+    configuration.resizeTimeout = setTimeout(() => {
+      configuration.resizeTimeout = null
       // IOS Safari throw random resize event on scroll, call layout only if size has changed
-      if (this._container.clientWidth != this._width) {
-        this.layout()
+      if (configuration.container.clientWidth !== configuration.width) {
+        layout(configuration)
       }
       // The actualResizeHandler will execute at a rate of 30fps
     }, 33)
   }
 }
 
-MiniMasonry.prototype.destroy = function () {
-  if (typeof this._removeListener === 'function') {
-    this._removeListener()
+function init(configuration: Configuration) {
+  // TODO what does this do?
+  // for (const i in configuration) {
+  //   if (configuration[i] !== undefined) {
+  //     this.conf[i] = conf[i]
+  //   }
+  // }
+
+  if (configuration.gutterX == null || configuration.gutterY == null) {
+    // eslint-disable-next-line no-multi-assign
+    configuration.gutterX = configuration.gutterY = configuration.gutter
+  }
+  configuration.currentGutterX = configuration.gutterX
+  configuration.currentGutterY = configuration.gutterY
+
+  const onResize = resizeThrottler.bind(this, configuration)
+  window.addEventListener('resize', onResize)
+  configuration.removeListener = function removeListener() {
+    window.removeEventListener('resize', onResize)
+    if (configuration.resizeTimeout != null) {
+      window.clearTimeout(configuration.resizeTimeout)
+      configuration.resizeTimeout = null
+    }
   }
 
-  const { children } = this._container
-  for (let k = 0; k < children.length; k++) {
-    children[k].style.removeProperty('width')
-    children[k].style.removeProperty('transform')
-  }
-  this._container.style.removeProperty('height')
-  this._container.style.removeProperty('min-width')
+  layout(configuration)
 }
 
-export function grid(element: HTMLElement) {
-  if (!element && process.env.NODE_ENV !== 'production') {
-    // eslint-disable-next-line no-console
-    console.log('masua: "element" parameter is missing or undefined.')
-    return
+function destroy(configuration: Configuration) {
+  if (typeof configuration.removeListener === 'function') {
+    configuration.removeListener()
   }
 
-  console.log('grid', element)
+  const { children } = configuration.container
+  for (let index = 0; index < children.length; index += 1) {
+    const child = children[index] as HTMLElement
+    child.style.removeProperty('width')
+    child.style.removeProperty('transform')
+  }
+  configuration.container.style.removeProperty('height')
+  configuration.container.style.removeProperty('min-width')
+}
 
-  const instance = new MiniMasonry({ container: element })
+export function grid(element: HTMLElement | string) {
+  if (!element && process.env.NODE_ENV !== 'production') {
+    throw new Error('masua: "element" parameter is missing or undefined.')
+  }
 
-  console.log('instance', instance)
+  const configuration: Configuration = {
+    sizes: [],
+    columns: [],
+    container: typeof element === 'string' ? document.querySelector(element) : element,
+    count: null,
+    width: 0,
+    removeListener: null,
+    currentGutterX: null,
+    currentGutterY: null,
+    resizeTimeout: null,
+    baseWidth: 255,
+    gutterX: null,
+    gutterY: null,
+    gutter: 10,
+    minify: true,
+    ultimateGutter: 5,
+    surroundingGutter: true,
+    direction: 'ltr',
+    wedge: false,
+  }
 
-  return () => {
-    console.log('clear')
+  init(configuration)
+
+  return {
+    destroy: () => destroy(configuration),
   }
 }
