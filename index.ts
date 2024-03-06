@@ -1,17 +1,17 @@
-interface Configuration {
+interface State {
   sizes: number[]
   columns: number[]
   container: HTMLElement
   count: number
   width: number
   removeListener: () => void
-  currentGutterX: number
-  currentGutterY: number
+  currentGutterX: number | string
+  currentGutterY: number | string
   resizeTimeout: NodeJS.Timeout
   baseWidth: number
-  gutterX: number
-  gutterY: number
-  gutter: number
+  gutterX: number | string
+  gutterY: number | string
+  gutter: number | string
   minify: boolean
   ultimateGutter: number
   surroundingGutter: boolean
@@ -19,38 +19,46 @@ interface Configuration {
   wedge: boolean
 }
 
-function getCount(configuration: Configuration) {
-  if (configuration.surroundingGutter) {
+export interface Configuration {
+  baseWidth: number
+  gutter: number | string
+  gutterX: number | string
+  gutterY: number | string
+  minify: boolean
+  surroundingGutter: boolean
+  ultimateGutter: number
+  direction: 'ltr' | 'rtl'
+  wedge: boolean
+}
+
+function getCount(state: State) {
+  if (state.surroundingGutter) {
     return Math.floor(
-      (configuration.width - configuration.currentGutterX) /
-        (configuration.baseWidth + configuration.currentGutterX),
+      (state.width - state.currentGutterX) / (state.baseWidth + state.currentGutterX),
     )
   }
 
-  return Math.floor(
-    (configuration.width + configuration.currentGutterX) /
-      (configuration.baseWidth + configuration.currentGutterX),
-  )
+  return Math.floor((state.width + state.currentGutterX) / (state.baseWidth + state.currentGutterX))
 }
 
-function getLongest(configuration: Configuration) {
+function getLongest(state: State) {
   let longest = 0
-  for (let index = 0; index < configuration.count; index += 1) {
-    if (configuration.columns[index] > configuration.columns[longest]) {
+  for (let index = 0; index < state.count; index += 1) {
+    if (state.columns[index] > state.columns[longest]) {
       longest = index
     }
   }
   return longest
 }
 
-function getNextColumn(index: number, configuration: Configuration) {
-  return index % configuration.columns.length
+function getNextColumn(index: number, state: State) {
+  return index % state.columns.length
 }
 
-function getShortest(configuration: Configuration) {
+function getShortest(state: State) {
   let shortest = 0
-  for (let index = 0; index < configuration.count; index += 1) {
-    if (configuration.columns[index] < configuration.columns[shortest]) {
+  for (let index = 0; index < state.count; index += 1) {
+    if (state.columns[index] < state.columns[shortest]) {
       shortest = index
     }
   }
@@ -58,141 +66,132 @@ function getShortest(configuration: Configuration) {
   return shortest
 }
 
-function reset(configuration: Configuration) {
-  configuration.sizes = []
-  configuration.columns = []
-  configuration.count = null
-  configuration.width = configuration.container.clientWidth
-  const minWidth = configuration.baseWidth
-  if (configuration.width < minWidth) {
-    configuration.width = minWidth
-    configuration.container.style.minWidth = `${minWidth}px`
+function reset(state: State) {
+  state.sizes = []
+  state.columns = []
+  state.count = null
+  state.width = state.container.clientWidth
+  const minWidth = state.baseWidth
+  if (state.width < minWidth) {
+    state.width = minWidth
+    state.container.style.minWidth = `${minWidth}px`
   }
 
-  if (getCount(configuration) === 1) {
+  if (getCount(state) === 1) {
     // Set ultimate gutter when only one column is displayed
-    configuration.currentGutterX = configuration.ultimateGutter
+    state.currentGutterX = state.ultimateGutter
     // As gutters are reduced, two column may fit, forcing to 1
-    configuration.count = 1
-  } else if (configuration.width < configuration.baseWidth + 2 * configuration.currentGutterX) {
+    state.count = 1
+  } else if (state.width < state.baseWidth + 2 * state.currentGutterX) {
     // Remove gutter when screen is to low
-    configuration.currentGutterX = 0
+    state.currentGutterX = 0
   } else {
-    configuration.currentGutterX = configuration.gutterX
+    state.currentGutterX = state.gutterX
   }
 }
 
-function computeWidth(configuration: Configuration) {
+function computeWidth(state: State) {
   let width
-  if (configuration.surroundingGutter) {
-    width =
-      (configuration.width - configuration.currentGutterX) / configuration.count -
-      configuration.currentGutterX
+  if (state.surroundingGutter) {
+    width = (state.width - state.currentGutterX) / state.count - state.currentGutterX
   } else {
-    width =
-      (configuration.width + configuration.currentGutterX) / configuration.count -
-      configuration.currentGutterX
+    width = (state.width + state.currentGutterX) / state.count - state.currentGutterX
   }
   width = Number.parseFloat(width.toFixed(2))
 
   return width
 }
 
-function layout(configuration: Configuration) {
-  if (!configuration.container) {
+function layout(state: State) {
+  if (!state.container) {
     console.error('Container not found')
     return
   }
-  reset(configuration)
+  reset(state)
 
   // Computing columns count
-  if (configuration.count == null) {
-    configuration.count = getCount(configuration)
+  if (state.count == null) {
+    state.count = getCount(state)
   }
   // Computing columns width
-  const colWidth = computeWidth(configuration)
+  const colWidth = computeWidth(state)
 
-  for (let index = 0; index < configuration.count; index += 1) {
-    configuration.columns[index] = 0
+  for (let index = 0; index < state.count; index += 1) {
+    state.columns[index] = 0
   }
 
   // Saving children real heights
-  const { children } = configuration.container
+  const { children } = state.container
   for (let index = 0; index < children.length; index += 1) {
     // Set colWidth before retrieving element height if content is proportional
     const child = children[index] as HTMLElement
     child.style.width = `${colWidth}px`
-    configuration.sizes[index] = child.clientHeight
+    state.sizes[index] = child.clientHeight
   }
 
   let startX
-  if (configuration.direction === 'ltr') {
-    startX = configuration.surroundingGutter ? configuration.currentGutterX : 0
+  if (state.direction === 'ltr') {
+    startX = state.surroundingGutter ? state.currentGutterX : 0
   } else {
-    startX =
-      configuration.width - (configuration.surroundingGutter ? configuration.currentGutterX : 0)
+    startX = state.width - (state.surroundingGutter ? state.currentGutterX : 0)
   }
-  if (configuration.count > configuration.sizes.length) {
+  if (state.count > state.sizes.length) {
     // If more columns than children
     const occupiedSpace =
-      configuration.sizes.length * (colWidth + configuration.currentGutterX) -
-      configuration.currentGutterX
-    if (configuration.wedge === false) {
-      if (configuration.direction === 'ltr') {
-        startX = (configuration.width - occupiedSpace) / 2
+      state.sizes.length * (colWidth + state.currentGutterX) - state.currentGutterX
+    if (state.wedge === false) {
+      if (state.direction === 'ltr') {
+        startX = (state.width - occupiedSpace) / 2
       } else {
-        startX = configuration.width - (configuration.width - occupiedSpace) / 2
+        startX = state.width - (state.width - occupiedSpace) / 2
       }
-    } else if (configuration.direction === 'ltr') {
+    } else if (state.direction === 'ltr') {
       //
     } else {
-      startX = configuration.width - configuration.currentGutterX
+      startX = state.width - state.currentGutterX
     }
   }
 
   // Computing position of children
   for (let index = 0; index < children.length; index += 1) {
-    const nextColumn = configuration.minify
-      ? getShortest(configuration)
-      : getNextColumn(index, configuration)
+    const nextColumn = state.minify ? getShortest(state) : getNextColumn(index, state)
 
     let childrenGutter = 0
-    if (configuration.surroundingGutter || nextColumn !== configuration.columns.length) {
-      childrenGutter = configuration.currentGutterX
+    if (state.surroundingGutter || nextColumn !== state.columns.length) {
+      childrenGutter = state.currentGutterX
     }
     let x: number
-    if (configuration.direction === 'ltr') {
+    if (state.direction === 'ltr') {
       x = startX + (colWidth + childrenGutter) * nextColumn
     } else {
       x = startX - (colWidth + childrenGutter) * nextColumn - colWidth
     }
-    const y = configuration.columns[nextColumn]
+    const y = state.columns[nextColumn]
     const child = children[index] as HTMLElement
     child.style.transform = `translate3d(${Math.round(x)}px,${Math.round(y)}px,0)`
 
-    configuration.columns[nextColumn] +=
-      configuration.sizes[index] +
-      (configuration.count > 1 ? configuration.gutterY : configuration.ultimateGutter) // margin-bottom
+    state.columns[nextColumn] +=
+      state.sizes[index] + (state.count > 1 ? state.gutterY : state.ultimateGutter) // margin-bottom
   }
 
-  configuration.container.style.height = `${configuration.columns[getLongest(configuration)] - configuration.currentGutterY}px`
+  state.container.style.height = `${state.columns[getLongest(state)] - state.currentGutterY}px`
 }
 
-function resizeThrottler(configuration: Configuration) {
+function resizeThrottler(state: State) {
   // ignore resize events as long as an actualResizeHandler execution is in the queue
-  if (!configuration.resizeTimeout) {
-    configuration.resizeTimeout = setTimeout(() => {
-      configuration.resizeTimeout = null
+  if (!state.resizeTimeout) {
+    state.resizeTimeout = setTimeout(() => {
+      state.resizeTimeout = null
       // IOS Safari throw random resize event on scroll, call layout only if size has changed
-      if (configuration.container.clientWidth !== configuration.width) {
-        layout(configuration)
+      if (state.container.clientWidth !== state.width) {
+        layout(state)
       }
       // The actualResizeHandler will execute at a rate of 30fps
     }, 33)
   }
 }
 
-function init(configuration: Configuration) {
+function init(state: State) {
   // TODO what does this do?
   // for (const i in configuration) {
   //   if (configuration[i] !== undefined) {
@@ -200,47 +199,43 @@ function init(configuration: Configuration) {
   //   }
   // }
 
-  if (configuration.gutterX == null || configuration.gutterY == null) {
-    // eslint-disable-next-line no-multi-assign
-    configuration.gutterX = configuration.gutterY = configuration.gutter
-  }
-  configuration.currentGutterX = configuration.gutterX
-  configuration.currentGutterY = configuration.gutterY
+  state.currentGutterX = state.gutterX
+  state.currentGutterY = state.gutterY
 
-  const onResize = resizeThrottler.bind(this, configuration)
+  const onResize = resizeThrottler.bind(this, state)
   window.addEventListener('resize', onResize)
-  configuration.removeListener = function removeListener() {
+  state.removeListener = function removeListener() {
     window.removeEventListener('resize', onResize)
-    if (configuration.resizeTimeout != null) {
-      window.clearTimeout(configuration.resizeTimeout)
-      configuration.resizeTimeout = null
+    if (state.resizeTimeout != null) {
+      window.clearTimeout(state.resizeTimeout)
+      state.resizeTimeout = null
     }
   }
 
-  layout(configuration)
+  layout(state)
 }
 
-function destroy(configuration: Configuration) {
-  if (typeof configuration.removeListener === 'function') {
-    configuration.removeListener()
+function destroy(state: State) {
+  if (typeof state.removeListener === 'function') {
+    state.removeListener()
   }
 
-  const { children } = configuration.container
+  const { children } = state.container
   for (let index = 0; index < children.length; index += 1) {
     const child = children[index] as HTMLElement
     child.style.removeProperty('width')
     child.style.removeProperty('transform')
   }
-  configuration.container.style.removeProperty('height')
-  configuration.container.style.removeProperty('min-width')
+  state.container.style.removeProperty('height')
+  state.container.style.removeProperty('min-width')
 }
 
-export function grid(element: HTMLElement | string) {
+export function grid(element: HTMLElement | string, configuration: Partial<Configuration> = {}) {
   if (!element && process.env.NODE_ENV !== 'production') {
     throw new Error('masua: "element" parameter is missing or undefined.')
   }
 
-  const configuration: Configuration = {
+  const state: State = {
     sizes: [],
     columns: [],
     container: typeof element === 'string' ? document.querySelector(element) : element,
@@ -251,19 +246,22 @@ export function grid(element: HTMLElement | string) {
     currentGutterY: null,
     resizeTimeout: null,
     baseWidth: 255,
-    gutterX: null,
-    gutterY: null,
     gutter: 10,
     minify: true,
     ultimateGutter: 5,
-    surroundingGutter: true,
+    surroundingGutter: false,
     direction: 'ltr',
     wedge: false,
+    ...configuration,
+    gutterX: configuration.gutterX || configuration.gutter || 10,
+    gutterY: configuration.gutterY || configuration.gutter || 10,
   }
 
-  init(configuration)
+  // TODO use calc if gutter is string.
+
+  init(state)
 
   return {
-    destroy: () => destroy(configuration),
+    destroy: () => destroy(state),
   }
 }

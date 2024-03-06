@@ -149,6 +149,36 @@ grid(document.querySelector('#my-grid'))`}</Code>
         <Box size={6} />
         <Box size={4} />
       </div>
+      <Heading as="h3">Configuration</Heading>
+      <div style={{ display: 'grid', gridTemplateColumns: 'auto auto auto', gap: scale(10) }}>
+        <span style={{ fontWeight: 'bold' }}>Property</span>
+        <span style={{ fontWeight: 'bold' }}>Default value</span>
+        <span style={{ fontWeight: 'bold' }}>Description</span>
+        <span>gutter</span>
+        <span>10</span>
+        <span>Space between elements.</span>
+        <span>gutterX | gutterY</span>
+        <span>gutter</span>
+        <span>Horizonal and vertical space between elements.</span>
+        <span>baseWidth</span>
+        <span>255</span>
+        <span>Target width of elements.</span>
+        <span>minify</span>
+        <span>true</span>
+        <span>Use less space but don't keep existing element order.</span>
+        <span>surroundingGutter</span>
+        <span>false</span>
+        <span>Add gutter around the whole grid.</span>
+        <span>ultimateGutter</span>
+        <span>5</span>
+        <span>Gutter when only one column is displayed.</span>
+        <span>direction</span>
+        <span>'ltr'</span>
+        <span>Sorting direction.</span>
+        <span>wedge</span>
+        <span style={{ fontFamily: 'monospace' }}>false</span>
+        <span>Sort from center or start from outside.</span>
+      </div>
       <Heading as="h2">React</Heading>
       <Code>{`import { Grid } from 'masua'
 
@@ -162,7 +192,7 @@ const MyGrid = () => (
     <Box size={4} />
 </Grid>
 )`}</Code>
-      <Grid>
+      <Grid gutter={20}>
         <Box />
         <Box size={3} />
         <Box size={2} />

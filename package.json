@@ -22,8 +22,8 @@
     }
   },
   "devDependencies": {
-    "@types/react": "^18.2.63",
-    "padua": "latest"
+    "@types/react": "^18.2.64",
+    "padua": "^4.0.0"
   },
   "peerDependencies": {
     "react": ">= 18"
@@ -65,7 +65,7 @@
     "extends": "./node_modules/padua/configuration/eslint.cjs"
   },
   "publishConfig": {
-    "provenance": false
+    "provenance": true
   },
   "engines": {
     "node": ">= 18"
