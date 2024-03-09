@@ -5,6 +5,8 @@ import { scale } from 'optica'
 import { grid } from 'masua'
 import { Grid } from 'masua/react'
 import logo from './logo.png'
+import { Color } from './style'
+import { Configuration, ConfigurationReact } from './ConfigurationTable'
 
 if ('paintWorklet' in CSS) {
   // Script loaded separately from /public folder after initial load.
@@ -27,19 +29,11 @@ const appStyles: CSSProperties = {
   gap: scale(20),
 }
 
-const Color = {
-  blue: {
-    ultralight: '#c3deff',
-    light: '#77b5ff',
-    regular: '#0075ff',
-    dark: '#0075ff',
-  },
-  boxes: ['#0075ff', '#ff002e', '#00ba6c', '#eb00ff', '#ffb800', '#09d3c7'],
-}
+const headingSize = { h1: scale(36), h2: scale(26), h3: scale(22) }
 
 const headingStyles = (as: 'h1' | 'h2' | 'h3'): CSSProperties => ({
   margin: 0,
-  fontSize: as === 'h1' ? scale(36) : scale(24),
+  fontSize: headingSize[as],
 })
 
 function Heading({
@@ -60,20 +54,17 @@ function Paragraph({ style, ...props }: JSX.IntrinsicElements['p']) {
   return <p {...props} style={{ ...paragraphStyles, ...style }} />
 }
 
+const codeStyles: CSSProperties = {
+  display: 'flex',
+  flexDirection: 'column',
+  padding: scale(20),
+  background: Color.blue.ultralight,
+  borderRadius: scale(20),
+  fontFamily: 'monospace',
+}
+
 function Code({ children }: { children: string }) {
-  return (
-    <div
-      style={{
-        display: 'flex',
-        flexDirection: 'column',
-        padding: scale(20),
-        background: Color.blue.ultralight,
-        borderRadius: scale(20),
-        fontFamily: 'monospace',
-      }}
-      dangerouslySetInnerHTML={{ __html: highlight(children) }}
-    />
-  )
+  return <div style={codeStyles} dangerouslySetInnerHTML={{ __html: highlight(children) }} />
 }
 
 let colorIndex = 0
@@ -150,35 +141,8 @@ grid(document.querySelector('#my-grid'))`}</Code>
         <Box size={4} />
       </div>
       <Heading as="h3">Configuration</Heading>
-      <div style={{ display: 'grid', gridTemplateColumns: 'auto auto auto', gap: scale(10) }}>
-        <span style={{ fontWeight: 'bold' }}>Property</span>
-        <span style={{ fontWeight: 'bold' }}>Default value</span>
-        <span style={{ fontWeight: 'bold' }}>Description</span>
-        <span>gutter</span>
-        <span>10</span>
-        <span>Space between elements.</span>
-        <span>gutterX | gutterY</span>
-        <span>gutter</span>
-        <span>Horizonal and vertical space between elements.</span>
-        <span>baseWidth</span>
-        <span>255</span>
-        <span>Target width of elements.</span>
-        <span>minify</span>
-        <span>true</span>
-        <span>Use less space but don't keep existing element order.</span>
-        <span>surroundingGutter</span>
-        <span>false</span>
-        <span>Add gutter around the whole grid.</span>
-        <span>ultimateGutter</span>
-        <span>5</span>
-        <span>Gutter when only one column is displayed.</span>
-        <span>direction</span>
-        <span>'ltr'</span>
-        <span>Sorting direction.</span>
-        <span>wedge</span>
-        <span style={{ fontFamily: 'monospace' }}>false</span>
-        <span>Sort from center or start from outside.</span>
-      </div>
+      <Configuration />
+
       <Heading as="h2">React</Heading>
       <Code>{`import { Grid } from 'masua'
 
@@ -200,6 +164,12 @@ const MyGrid = () => (
         <Box size={6} />
         <Box size={4} />
       </Grid>
+      <Heading as="h3">Configuration</Heading>
+      <Paragraph>
+        The React plugin inherits all the regular configuration above and adds the following
+        properties.
+      </Paragraph>
+      <ConfigurationReact />
     </div>
   )
 }

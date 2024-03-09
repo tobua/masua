@@ -4,7 +4,7 @@
 
 # masua
 
-Simple masonry layout library in TypeScript.
+Simple masonry layout library in TypeScript. Initially forked from [minimasonry](https://github.com/Spope/MiniMasonry.js) by Spope.
 
 ## Usage
 
@@ -12,6 +12,16 @@ Simple masonry layout library in TypeScript.
 import { grid } from 'masua'
 
 grid(document.querySelector('#my-grid'))
+// With configuration options.
+grid(document.querySelector('#my-custom-grid'), {
+  gutter: 20,
+  baseWidth: 300,
+  minify: false,
+  surroundingGutter: true,
+  ultimateGutter: 10,
+  direction: 'rtl',
+  wedge: true,
+})
 ```
 
 ## React
@@ -20,7 +30,7 @@ grid(document.querySelector('#my-grid'))
 import { Grid } from 'masua'
 
 const MyGrid = () => (
-  <Grid>
+  <Grid disabled={window.innerWidth < 501}>
     <Box />
     <Box size={3} />
     <Box size={2} />

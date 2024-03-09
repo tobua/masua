@@ -19,6 +19,7 @@ const configurationProperties = [
 
 export function Grid({
   disabled = false,
+  children,
   ...props
 }: JSX.IntrinsicElements['div'] & Partial<ReactConfiguration>) {
   const gridRef = useRef(null)
@@ -37,7 +38,11 @@ export function Grid({
   useEffect(() => {
     if (disabled) return () => {}
     return grid(gridRef.current, configurationProps).destroy
-  }, [])
+  }, [children])
 
-  return <div ref={gridRef} {...props} />
+  return (
+    <div ref={gridRef} {...props}>
+      {children}
+    </div>
+  )
 }
