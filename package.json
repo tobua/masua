@@ -22,7 +22,7 @@
     }
   },
   "devDependencies": {
-    "@types/react": "^18.2.64",
+    "@types/react": "^18.2.65",
     "padua": "^4.0.0"
   },
   "peerDependencies": {

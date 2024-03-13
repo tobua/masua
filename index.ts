@@ -263,5 +263,6 @@ export function grid(element: HTMLElement | string, configuration: Partial<Confi
 
   return {
     destroy: () => destroy(state),
+    update: () => layout(state),
   }
 }

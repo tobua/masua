@@ -17,6 +17,8 @@ const configurationProperties = [
   'wedge',
 ]
 
+let instance: any
+
 export function Grid({
   disabled = false,
   children,
@@ -37,7 +39,12 @@ export function Grid({
 
   useEffect(() => {
     if (disabled) return () => {}
-    return grid(gridRef.current, configurationProps).destroy
+    if (instance) {
+      instance.update()
+      return instance.destroy
+    }
+    instance = grid(gridRef.current, configurationProps)
+    return instance.destroy
   }, [children])
 
   return (
