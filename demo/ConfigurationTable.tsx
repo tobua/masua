@@ -48,8 +48,8 @@ export function Configuration() {
       <Code>false</Code>
       <Code>boolean</Code>
       <span>Add gutter around the whole grid.</span>
-      <span>ultimateGutter</span>
-      <Code>5</Code>
+      <span>singleColumnGutter</span>
+      <Code>gutterY / gutter</Code>
       <Code>number | string</Code>
       <span>Gutter when only one column is displayed.</span>
       <span>direction</span>

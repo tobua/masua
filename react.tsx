@@ -12,12 +12,10 @@ const configurationProperties = [
   'gutterY',
   'minify',
   'surroundingGutter',
-  'ultimateGutter',
+  'singleColumnGutter',
   'direction',
   'wedge',
 ]
-
-let instance: any
 
 export function Grid({
   disabled = false,
@@ -25,6 +23,7 @@ export function Grid({
   ...props
 }: JSX.IntrinsicElements['div'] & Partial<ReactConfiguration>) {
   const gridRef = useRef(null)
+  const instance = useRef<ReturnType<typeof grid>>(null)
   const configurationProps = useMemo(
     () =>
       Object.entries(props).reduce((result, [key, value]) => {
@@ -39,12 +38,12 @@ export function Grid({
 
   useEffect(() => {
     if (disabled) return () => {}
-    if (instance) {
-      instance.update()
-      return instance.destroy
+    if (instance.current) {
+      instance.current.update()
+      return instance.current.destroy
     }
-    instance = grid(gridRef.current, configurationProps)
-    return instance.destroy
+    instance.current = grid(gridRef.current, configurationProps)
+    return instance.current.destroy
   }, [children])
 
   return (

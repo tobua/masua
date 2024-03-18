@@ -18,7 +18,7 @@ grid(document.querySelector('#my-custom-grid'), {
   baseWidth: 300,
   minify: false,
   surroundingGutter: true,
-  ultimateGutter: 10,
+  singleColumnGutter: 10,
   direction: 'rtl',
   wedge: true,
 })

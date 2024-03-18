@@ -13,7 +13,7 @@ interface State {
   gutterY: number | string
   gutter: number | string
   minify: boolean
-  ultimateGutter: number
+  singleColumnGutter: string | number
   surroundingGutter: boolean
   direction: 'ltr' | 'rtl'
   wedge: boolean
@@ -26,7 +26,7 @@ export interface Configuration {
   gutterY: number | string
   minify: boolean
   surroundingGutter: boolean
-  ultimateGutter: number
+  singleColumnGutter: number
   direction: 'ltr' | 'rtl'
   wedge: boolean
 }
@@ -79,7 +79,7 @@ function reset(state: State) {
 
   if (getCount(state) === 1) {
     // Set ultimate gutter when only one column is displayed
-    state.currentGutterX = state.ultimateGutter
+    state.currentGutterX = state.singleColumnGutter
     // As gutters are reduced, two column may fit, forcing to 1
     state.count = 1
   } else if (state.width < state.baseWidth + 2 * state.currentGutterX) {
@@ -171,7 +171,7 @@ function layout(state: State) {
     child.style.transform = `translate3d(${Math.round(x)}px,${Math.round(y)}px,0)`
 
     state.columns[nextColumn] +=
-      state.sizes[index] + (state.count > 1 ? state.gutterY : state.ultimateGutter) // margin-bottom
+      state.sizes[index] + (state.count > 1 ? state.gutterY : state.singleColumnGutter) // margin-bottom
   }
 
   state.container.style.height = `${state.columns[getLongest(state)] - state.currentGutterY}px`
@@ -248,13 +248,15 @@ export function grid(element: HTMLElement | string, configuration: Partial<Confi
     baseWidth: 255,
     gutter: 10,
     minify: true,
-    ultimateGutter: 5,
     surroundingGutter: false,
     direction: 'ltr',
     wedge: false,
     ...configuration,
     gutterX: configuration.gutterX || configuration.gutter || 10,
     gutterY: configuration.gutterY || configuration.gutter || 10,
+    // One column is theoretically an Y-gutter so that's preferred if available.
+    singleColumnGutter:
+      configuration.singleColumnGutter || configuration.gutterY || configuration.gutter || 10,
   }
 
   // TODO use calc if gutter is string.
@@ -263,6 +265,13 @@ export function grid(element: HTMLElement | string, configuration: Partial<Confi
 
   return {
     destroy: () => destroy(state),
-    update: () => layout(state),
+    update: (changes: Partial<Configuration> = {}) => {
+      Object.assign(state, changes)
+      state.gutterX = changes.gutterX || changes.gutter || state.gutterX
+      state.gutterY = changes.gutterY || changes.gutter || state.gutterY
+      state.singleColumnGutter =
+        changes.singleColumnGutter || changes.gutterY || changes.gutter || state.singleColumnGutter
+      layout(state)
+    },
   }
 }
