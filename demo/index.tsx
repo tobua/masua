@@ -7,6 +7,9 @@ import { Grid } from 'masua/react'
 import logo from './logo.png'
 import { Color } from './style'
 import { Configuration, ConfigurationReact } from './ConfigurationTable'
+import { Input } from './markup/Input'
+import { Select } from './markup/Select'
+import { Checkbox } from './markup/Checkbox'
 
 if ('paintWorklet' in CSS) {
   // Script loaded separately from /public folder after initial load.
@@ -54,75 +57,12 @@ function Paragraph({ style, ...props }: JSX.IntrinsicElements['p']) {
   return <p {...props} style={{ ...paragraphStyles, ...style }} />
 }
 
-const inputStyles: CSSProperties = {
-  outline: 'none',
-  background: Color.blue.light,
-  border: 'none',
-  padding: scale(20),
-  borderRadius: scale(10),
+const rowStyles: CSSProperties = {
+  display: 'flex',
+  gap: scale(20),
+  alignItems: 'flex-end',
+  flexWrap: 'wrap',
 }
-
-function Input({
-  style,
-  onValue,
-  ...props
-}: JSX.IntrinsicElements['input'] & { onValue: (value: number) => void }) {
-  return (
-    <input
-      onChange={(event) => onValue(Number(event.target.value))}
-      style={{ ...inputStyles, ...style }}
-      {...props}
-    />
-  )
-}
-
-const selectStyles: CSSProperties = {
-  outline: 'none',
-  background: Color.blue.light,
-  border: 'none',
-}
-
-function Select({
-  options,
-  style,
-  ...props
-}: JSX.IntrinsicElements['select'] & { options: string[] }) {
-  return (
-    <select style={{ ...selectStyles, ...style }} {...props}>
-      {options.map((option) => (
-        <option key={option} value={option}>
-          {option}
-        </option>
-      ))}
-    </select>
-  )
-}
-
-const checkboxStyles: CSSProperties = {
-  outline: 'none',
-  background: Color.blue.light,
-  border: 'none',
-  padding: scale(10),
-  borderRadius: scale(10),
-  cursor: 'pointer',
-  display: 'inline-flex',
-  alignItems: 'center',
-}
-
-const checkboxLabelStyles: CSSProperties = {
-  marginLeft: scale(10),
-}
-
-function Checkbox({ children, style, ...props }: JSX.IntrinsicElements['input']) {
-  return (
-    <label style={{ display: 'inline-flex', alignItems: 'center' }}>
-      <input type="checkbox" style={{ ...checkboxStyles, ...style }} {...props} />
-      <span style={checkboxLabelStyles}>{children}</span>
-    </label>
-  )
-}
-
-const rowStyles: CSSProperties = { display: 'flex', gap: scale(20) }
 
 const codeStyles: CSSProperties = {
   display: 'flex',
@@ -163,16 +103,34 @@ function App() {
   const gridInstance = useRef<ReturnType<typeof grid>>(null)
   const [gutter, setGutter] = useState(10)
   const [baseWidth, setBaseWidth] = useState(255)
+  const [direction, setDirection] = useState<'ltr' | 'rtl'>('ltr')
+  const [minify, setMinify] = useState(true)
+  const [surroundingGutter, setSurroundingGutter] = useState(false)
+  const [wedge, setWedge] = useState(false)
 
   useEffect(() => {
     console.log('gutter', gridInstance.current, gutter)
     if (gridInstance.current) {
-      gridInstance.current.update({ gutter, baseWidth })
+      gridInstance.current.update({
+        gutter,
+        baseWidth,
+        direction,
+        minify,
+        surroundingGutter,
+        wedge,
+      })
       return gridInstance.current.destroy
     }
-    gridInstance.current = grid(gridRef.current, { gutter, baseWidth })
+    gridInstance.current = grid(gridRef.current, {
+      gutter,
+      baseWidth,
+      direction,
+      minify,
+      surroundingGutter,
+      wedge,
+    })
     return gridInstance.current.destroy
-  }, [gutter, baseWidth])
+  }, [gutter, baseWidth, direction, minify, surroundingGutter, wedge])
 
   return (
     <div style={appStyles}>
@@ -225,12 +183,23 @@ grid(document.querySelector('#my-grid'))`}</Code>
       <div style={rowStyles}>
         <Input placeholder="Gutter" value={gutter} onValue={setGutter} />
         <Input placeholder="Base Width" value={baseWidth} onValue={setBaseWidth} />
-        <Checkbox onChange={() => {}} checked={true}>
+        <Checkbox checked={minify} onToggle={setMinify}>
           Minify
         </Checkbox>
-        <Checkbox onChange={() => {}}>Surrounding Gutter</Checkbox>
-        <Select options={['ltr', 'rtl']} />
-        <Checkbox onChange={() => {}}>Wedge</Checkbox>
+        <Checkbox checked={surroundingGutter} onToggle={setSurroundingGutter}>
+          Surrounding Gutter
+        </Checkbox>
+        <Select
+          placeholder="Direction"
+          onOption={(option: 'ltr' | 'rtl') => setDirection(option)}
+          options={[
+            { label: 'Left to Right', value: 'ltr' },
+            { label: 'Right to Left', value: 'rtl' },
+          ]}
+        />
+        <Checkbox checked={wedge} onToggle={setWedge}>
+          Wedge
+        </Checkbox>
       </div>
       <Configuration />
       <Heading as="h2">React</Heading>
