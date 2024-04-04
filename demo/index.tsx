@@ -1,15 +1,15 @@
+import { grid } from 'masua'
+import { Grid } from 'masua/react'
+import { scale } from 'optica'
 import { type CSSProperties, useEffect, useRef, useState } from 'react'
 import { createRoot } from 'react-dom/client'
 import { highlight } from 'sugar-high'
-import { scale } from 'optica'
-import { grid } from 'masua'
-import { Grid } from 'masua/react'
-import logo from './logo.png'
-import { Color } from './style'
 import { Configuration, ConfigurationReact } from './ConfigurationTable'
+import logo from './logo.png'
+import { Checkbox } from './markup/Checkbox'
 import { Input } from './markup/Input'
 import { Select } from './markup/Select'
-import { Checkbox } from './markup/Checkbox'
+import { Color } from './style'
 
 if ('paintWorklet' in CSS) {
   // Script loaded separately from /public folder after initial load.
@@ -39,11 +39,7 @@ const headingStyles = (as: 'h1' | 'h2' | 'h3'): CSSProperties => ({
   fontSize: headingSize[as],
 })
 
-function Heading({
-  as = 'h1',
-  style,
-  ...props
-}: JSX.IntrinsicElements['h1' | 'h2' | 'h3'] & { as?: 'h1' | 'h2' | 'h3' }) {
+function Heading({ as = 'h1', style, ...props }: JSX.IntrinsicElements['h1' | 'h2' | 'h3'] & { as?: 'h1' | 'h2' | 'h3' }) {
   const Component = as
   return <Component {...props} style={{ ...headingStyles(as), ...style }} />
 }
@@ -163,8 +159,7 @@ function App() {
       <img style={{ width: scale(200), alignSelf: 'center' }} src={logo} alt="masua Logo" />
       <Heading>masua</Heading>
       <Paragraph>
-        Masua is a <b>simple</b> and <b>small</b>{' '}
-        <span style={{ color: Color.blue.regular }}>Masonry</span> layout grid component in
+        Masua is a <b>simple</b> and <b>small</b> <span style={{ color: Color.blue.regular }}>Masonry</span> layout grid component in
         TypeScript for the browser. It comes with a vanilla JavaScript and a React JSX version.
       </Paragraph>
       <Heading as="h2">Usage</Heading>
@@ -224,10 +219,7 @@ const MyGrid = () => (
         <Box size={4} />
       </Grid>
       <Heading as="h3">Configuration</Heading>
-      <Paragraph>
-        The React plugin inherits all the regular configuration above and adds the following
-        properties.
-      </Paragraph>
+      <Paragraph>The React plugin inherits all the regular configuration above and adds the following properties.</Paragraph>
       <ConfigurationReact />
     </div>
   )

@@ -2,18 +2,19 @@ interface State {
   sizes: number[]
   columns: number[]
   container: HTMLElement
+  // Number of columns, only used for internal calculations.
   count: number
   width: number
-  removeListener: () => void
-  currentGutterX: number | string
-  currentGutterY: number | string
-  resizeTimeout: NodeJS.Timeout
+  removeListener?: () => void
+  currentGutterX: number
+  currentGutterY: number
+  resizeTimeout?: NodeJS.Timeout
   baseWidth: number
-  gutterX: number | string
-  gutterY: number | string
-  gutter: number | string
+  gutterX: number
+  gutterY: number
+  gutter: number
   minify: boolean
-  singleColumnGutter: string | number
+  singleColumnGutter: number
   surroundingGutter: boolean
   direction: 'ltr' | 'rtl'
   wedge: boolean
@@ -31,11 +32,18 @@ export interface Configuration {
   wedge: boolean
 }
 
+interface NumberConfiguration extends Configuration {
+  gutter: number
+  gutterX: number
+  gutterY: number
+  singleColumnGutter: number
+}
+
+const log = (message: string) => console.log(`masua: ${message}.`)
+
 function getCount(state: State) {
   if (state.surroundingGutter) {
-    return Math.floor(
-      (state.width - state.currentGutterX) / (state.baseWidth + state.currentGutterX),
-    )
+    return Math.floor((state.width - state.currentGutterX) / (state.baseWidth + state.currentGutterX))
   }
 
   return Math.floor((state.width + state.currentGutterX) / (state.baseWidth + state.currentGutterX))
@@ -69,7 +77,7 @@ function getShortest(state: State) {
 function reset(state: State) {
   state.sizes = []
   state.columns = []
-  state.count = null
+  state.count = 0
   state.width = state.container.clientWidth
   const minWidth = state.baseWidth
   if (state.width < minWidth) {
@@ -91,7 +99,7 @@ function reset(state: State) {
 }
 
 function computeWidth(state: State) {
-  let width
+  let width: number
   if (state.surroundingGutter) {
     width = (state.width - state.currentGutterX) / state.count - state.currentGutterX
   } else {
@@ -102,6 +110,7 @@ function computeWidth(state: State) {
   return width
 }
 
+// biome-ignore lint/complexity/noExcessiveCognitiveComplexity: TODO decrease complexity
 function layout(state: State) {
   if (!state.container) {
     console.error('Container not found')
@@ -110,7 +119,7 @@ function layout(state: State) {
   reset(state)
 
   // Computing columns count
-  if (state.count == null) {
+  if (state.count === 0) {
     state.count = getCount(state)
   }
   // Computing columns width
@@ -129,7 +138,7 @@ function layout(state: State) {
     state.sizes[index] = child.clientHeight
   }
 
-  let startX
+  let startX: number
   if (state.direction === 'ltr') {
     startX = state.surroundingGutter ? state.currentGutterX : 0
   } else {
@@ -137,8 +146,7 @@ function layout(state: State) {
   }
   if (state.count > state.sizes.length) {
     // If more columns than children
-    const occupiedSpace =
-      state.sizes.length * (colWidth + state.currentGutterX) - state.currentGutterX
+    const occupiedSpace = state.sizes.length * (colWidth + state.currentGutterX) - state.currentGutterX
     if (state.wedge === false) {
       if (state.direction === 'ltr') {
         startX = (state.width - occupiedSpace) / 2
@@ -170,8 +178,7 @@ function layout(state: State) {
     const child = children[index] as HTMLElement
     child.style.transform = `translate3d(${Math.round(x)}px,${Math.round(y)}px,0)`
 
-    state.columns[nextColumn] +=
-      state.sizes[index] + (state.count > 1 ? state.gutterY : state.singleColumnGutter) // margin-bottom
+    state.columns[nextColumn] += state.sizes[index] + (state.count > 1 ? state.gutterY : state.singleColumnGutter) // margin-bottom
   }
 
   state.container.style.height = `${state.columns[getLongest(state)] - state.currentGutterY}px`
@@ -181,7 +188,7 @@ function resizeThrottler(state: State) {
   // ignore resize events as long as an actualResizeHandler execution is in the queue
   if (!state.resizeTimeout) {
     state.resizeTimeout = setTimeout(() => {
-      state.resizeTimeout = null
+      state.resizeTimeout = undefined
       // IOS Safari throw random resize event on scroll, call layout only if size has changed
       if (state.container.clientWidth !== state.width) {
         layout(state)
@@ -202,13 +209,13 @@ function init(state: State) {
   state.currentGutterX = state.gutterX
   state.currentGutterY = state.gutterY
 
-  const onResize = resizeThrottler.bind(this, state)
+  const onResize = resizeThrottler.bind(null, state)
   window.addEventListener('resize', onResize)
   state.removeListener = function removeListener() {
     window.removeEventListener('resize', onResize)
     if (state.resizeTimeout != null) {
       window.clearTimeout(state.resizeTimeout)
-      state.resizeTimeout = null
+      state.resizeTimeout = undefined
     }
   }
 
@@ -221,13 +228,63 @@ function destroy(state: State) {
   }
 
   const { children } = state.container
-  for (let index = 0; index < children.length; index += 1) {
-    const child = children[index] as HTMLElement
-    child.style.removeProperty('width')
-    child.style.removeProperty('transform')
+  for (const child of Array.from(children)) {
+    const childElement = child as HTMLElement
+    childElement.style.removeProperty('width')
+    childElement.style.removeProperty('transform')
   }
   state.container.style.removeProperty('height')
   state.container.style.removeProperty('min-width')
+}
+
+const sizeCache = new Map<string, number>()
+
+function getSizeInPixels(size: string) {
+  const fromCache = sizeCache.get(size)
+
+  if (fromCache) {
+    return fromCache
+  }
+
+  const tempElement = document.createElement('div')
+  tempElement.style.width = size
+  document.body.appendChild(tempElement)
+  const computedWidth = window.getComputedStyle(tempElement).width
+  document.body.removeChild(tempElement)
+  const pixels = Number.parseFloat(computedWidth)
+  sizeCache.set(size, pixels)
+  return pixels
+}
+
+const sizeValues: (keyof Configuration)[] = ['gutter', 'gutterX', 'gutterY', 'singleColumnGutter']
+
+function convertStringSizesToPixels(configuration: Partial<Configuration>): Partial<NumberConfiguration> {
+  for (const property of sizeValues) {
+    const value = configuration[property]
+    if (typeof value === 'string') {
+      configuration.gutter = getSizeInPixels(value)
+    }
+  }
+
+  return configuration as Partial<NumberConfiguration>
+}
+
+function getContainer(element: HTMLElement | string) {
+  if (typeof element === 'string') {
+    const foundElementOnPage = document.querySelector(element) as HTMLElement
+    if (!foundElementOnPage) {
+      log(`element with selector ${element} not found on page`)
+      return false
+    }
+    return foundElementOnPage
+  }
+
+  if (element instanceof HTMLElement) {
+    return element
+  }
+
+  log('first argument invalid, must be HTMLElement or a string')
+  return false
 }
 
 export function grid(element: HTMLElement | string, configuration: Partial<Configuration> = {}) {
@@ -235,42 +292,47 @@ export function grid(element: HTMLElement | string, configuration: Partial<Confi
     throw new Error('masua: "element" parameter is missing or undefined.')
   }
 
+  const container = getContainer(element)
+
+  if (!container) {
+    return
+  }
+
+  const numberConfiguration = convertStringSizesToPixels(configuration)
+
   const state: State = {
     sizes: [],
     columns: [],
-    container: typeof element === 'string' ? document.querySelector(element) : element,
-    count: null,
+    container,
+    count: 0,
     width: 0,
-    removeListener: null,
-    currentGutterX: null,
-    currentGutterY: null,
-    resizeTimeout: null,
     baseWidth: 255,
     gutter: 10,
     minify: true,
     surroundingGutter: false,
     direction: 'ltr',
     wedge: false,
-    ...configuration,
-    gutterX: configuration.gutterX || configuration.gutter || 10,
-    gutterY: configuration.gutterY || configuration.gutter || 10,
+    currentGutterX: 0,
+    currentGutterY: 0,
+    ...numberConfiguration,
+    gutterX: numberConfiguration.gutterX || numberConfiguration.gutter || 10,
+    gutterY: numberConfiguration.gutterY || numberConfiguration.gutter || 10,
     // One column is theoretically an Y-gutter so that's preferred if available.
-    singleColumnGutter:
-      configuration.singleColumnGutter || configuration.gutterY || configuration.gutter || 10,
+    singleColumnGutter: numberConfiguration.singleColumnGutter || numberConfiguration.gutterY || numberConfiguration.gutter || 10,
   }
-
-  // TODO use calc if gutter is string.
 
   init(state)
 
   return {
     destroy: () => destroy(state),
     update: (changes: Partial<Configuration> = {}) => {
-      Object.assign(state, changes)
-      state.gutterX = changes.gutterX || changes.gutter || state.gutterX
-      state.gutterY = changes.gutterY || changes.gutter || state.gutterY
+      // TODO animate box and container location/height changes.
+      const numberChanges = convertStringSizesToPixels(changes)
+      Object.assign(state, numberChanges)
+      state.gutterX = numberChanges.gutterX || numberChanges.gutter || state.gutterX
+      state.gutterY = numberChanges.gutterY || numberChanges.gutter || state.gutterY
       state.singleColumnGutter =
-        changes.singleColumnGutter || changes.gutterY || changes.gutter || state.singleColumnGutter
+        numberChanges.singleColumnGutter || numberChanges.gutterY || numberChanges.gutter || state.singleColumnGutter
       layout(state)
     },
   }

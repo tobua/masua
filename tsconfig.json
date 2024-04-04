@@ -1,0 +1,9 @@
+{
+	"compilerOptions": {
+		"strict": true,
+		"lib": ["DOM", "ESNext"],
+		"module": "Preserve",
+		"jsx": "react-jsx"
+	},
+	"files": ["index.ts", "react.tsx"]
+}

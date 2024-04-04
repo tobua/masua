@@ -10,32 +10,24 @@
     "Spope (minimasonry)"
   ],
   "scripts": {
-    "build": "padua build",
-    "start": "padua watch"
-  },
-  "padua": {
-    "tsconfig": {
-      "include": [
-        "index.ts",
-        "react.tsx"
-      ]
-    }
+    "format": "bun biome format . --write",
+    "lint": "bun biome lint .",
+    "types": "tsc --noEmit"
   },
   "devDependencies": {
-    "@types/react": "^18.2.67",
-    "padua": "^4.0.0"
+    "@biomejs/biome": "^1.6.4",
+    "@types/react": "^18.2.74",
+    "typescript": "^5.4.4"
   },
   "peerDependencies": {
-    "react": ">= 18"
+    "react": ">= 18",
+    "typescript": ">= 5"
   },
   "peerDependenciesMeta": {
     "react": {
       "optional": true
     }
   },
-  "trustedDependencies": [
-    "padua"
-  ],
   "type": "module",
   "sideEffects": false,
   "main": "./index.ts",
@@ -48,8 +40,8 @@
     }
   },
   "files": [
-    "index.ts",
-    "react.tsx"
+    "*.ts",
+    "*.tsx"
   ],
   "keywords": [
     "masonry",
@@ -60,10 +52,6 @@
     "react",
     "typescript"
   ],
-  "prettier": "padua/configuration/.prettierrc.json",
-  "eslintConfig": {
-    "extends": "./node_modules/padua/configuration/eslint.cjs"
-  },
   "publishConfig": {
     "provenance": true
   },

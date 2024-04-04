@@ -1,5 +1,5 @@
-import { useRef, useEffect, useMemo } from 'react'
-import { grid, type Configuration } from 'masua'
+import { type Configuration, grid } from 'masua'
+import { type JSX, useEffect, useMemo, useRef } from 'react'
 
 interface ReactConfiguration extends Configuration {
   disabled: boolean
@@ -17,18 +17,15 @@ const configurationProperties = [
   'wedge',
 ]
 
-export function Grid({
-  disabled = false,
-  children,
-  ...props
-}: JSX.IntrinsicElements['div'] & Partial<ReactConfiguration>) {
+export function Grid({ disabled = false, children, ...props }: JSX.IntrinsicElements['div'] & Partial<ReactConfiguration>) {
   const gridRef = useRef(null)
-  const instance = useRef<ReturnType<typeof grid>>(null)
+  const instance = useRef<ReturnType<typeof grid> | null>(null)
   const configurationProps = useMemo(
     () =>
-      Object.entries(props).reduce((result, [key, value]) => {
+      Object.entries(props).reduce((result: { [key: string]: string }, [key, value]) => {
         if (configurationProperties.includes(key)) {
           result[key] = value
+          // @ts-ignore
           delete props[key]
         }
         return result
@@ -37,14 +34,20 @@ export function Grid({
   )
 
   useEffect(() => {
-    if (disabled) return () => {}
+    if (disabled) {
+      return
+    }
     if (instance.current) {
       instance.current.update()
       return instance.current.destroy
     }
+    if (!gridRef.current) {
+      return
+    }
+
     instance.current = grid(gridRef.current, configurationProps)
-    return instance.current.destroy
-  }, [children])
+    return instance.current?.destroy
+  }, [configurationProps, disabled])
 
   return (
     <div ref={gridRef} {...props}>
