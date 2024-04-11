@@ -97,15 +97,14 @@ function Box({ size = 1 }) {
 function App() {
   const gridRef = useRef(null)
   const gridInstance = useRef<ReturnType<typeof grid>>(null)
-  const [gutter, setGutter] = useState(10)
-  const [baseWidth, setBaseWidth] = useState(255)
+  const [gutter, setGutter] = useState<number | string>(10)
+  const [baseWidth, setBaseWidth] = useState<number>(255)
   const [direction, setDirection] = useState<'ltr' | 'rtl'>('ltr')
   const [minify, setMinify] = useState(true)
   const [surroundingGutter, setSurroundingGutter] = useState(false)
   const [wedge, setWedge] = useState(false)
 
   useEffect(() => {
-    console.log('gutter', gridInstance.current, gutter)
     if (gridInstance.current) {
       gridInstance.current.update({
         gutter,
@@ -176,8 +175,8 @@ grid(document.querySelector('#my-grid'))`}</Code>
       </div>
       <Heading as="h3">Configuration</Heading>
       <div style={rowStyles}>
-        <Input placeholder="Gutter" value={gutter} onValue={setGutter} />
-        <Input placeholder="Base Width" value={baseWidth} onValue={setBaseWidth} />
+        <Input placeholder="Gutter" type="text" value={gutter} onValue={setGutter} />
+        <Input placeholder="Base Width" type="number" value={baseWidth} onValue={setBaseWidth} />
         <Checkbox checked={minify} onToggle={setMinify}>
           Minify
         </Checkbox>

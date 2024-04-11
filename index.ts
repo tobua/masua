@@ -8,7 +8,7 @@ interface State {
   removeListener?: () => void
   currentGutterX: number
   currentGutterY: number
-  resizeTimeout?: NodeJS.Timeout
+  resizeTimeout?: ReturnType<typeof setTimeout>
   baseWidth: number
   gutterX: number
   gutterY: number

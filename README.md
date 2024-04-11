@@ -7,8 +7,17 @@
 Simple masonry layout library in TypeScript. Initially forked from [minimasonry](https://github.com/Spope/MiniMasonry.js) by Spope.
 
 - ❗ Check out the [interactive demo and documentation](https://tobua.github.io/masua)
-- ⚛️ JavaScript and React support
-- ⚠️ Published as TypeScript and JSX (for the React plugin) see [this post on 𝕏](https://twitter.com/matthiasgiger/status/1766443368567971946) for the reasoning
+- ⚛️ TypeScript and React support
+
+## Installation
+
+⚠️ This plugin is published as TypeScript and JSX (for the React plugin) see [this post on 𝕏](https://twitter.com/matthiasgiger/status/1766443368567971946) for the reasoning. Make sure to add the necessary types listed below if they are missing in your project and align your [`tsconfig.json`](https://github.com/tobua/masua/blob/main/tsconfig.json) with the reference used for this project. React is only required when the `masua/react` export is used.
+
+```sh
+bun install masua
+bun install @types/bun # or @types/node
+bun install @types/react # for React export
+```
 
 ## Usage
 
@@ -31,7 +40,7 @@ grid(document.querySelector('#my-custom-grid'), {
 ## React
 
 ```tsx
-import { Grid } from 'masua'
+import { Grid } from 'masua/react'
 
 const MyGrid = () => (
   <Grid disabled={window.innerWidth < 501}>

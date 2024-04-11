@@ -8,6 +8,9 @@ export const Color = {
   boxes: ['#0075ff', '#ff002e', '#00ba6c', '#eb00ff', '#ffb800', '#09d3c7'],
   black: '#000000',
   white: '#FFFFFF',
+  error: '#F44336',
+  warning: '#FF9800',
+  success: '#4CAF50',
   gray: {
     50: '#FAFAFA',
     100: '#F5F5F5',
