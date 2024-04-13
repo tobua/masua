@@ -39,7 +39,7 @@ interface NumberConfiguration extends Configuration {
   singleColumnGutter: number
 }
 
-const log = (message: string) => console.log(`masua: ${message}.`)
+const log = (message: string, type: 'log' | 'error' = 'log') => console[type](`masua: ${message}.`)
 
 function getCount(state: State) {
   if (state.surroundingGutter) {
@@ -113,7 +113,7 @@ function computeWidth(state: State) {
 // biome-ignore lint/complexity/noExcessiveCognitiveComplexity: TODO decrease complexity
 function layout(state: State) {
   if (!state.container) {
-    console.error('Container not found')
+    log('Container not found', 'error')
     return
   }
   reset(state)
@@ -177,6 +177,7 @@ function layout(state: State) {
     const y = state.columns[nextColumn]
     const child = children[index] as HTMLElement
     child.style.transform = `translate3d(${Math.round(x)}px,${Math.round(y)}px,0)`
+    child.style.position = 'absolute'
 
     state.columns[nextColumn] += state.sizes[index] + (state.count > 1 ? state.gutterY : state.singleColumnGutter) // margin-bottom
   }

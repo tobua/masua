@@ -79,7 +79,6 @@ const boxStyles = (size: number, sizeFactor = 40): CSSProperties => {
   const color = Color.boxes[colorIndex++ % 6]
 
   return {
-    position: 'absolute',
     width: scale(100),
     height: scale(size * sizeFactor),
     background: 'paintWorklet' in CSS ? 'paint(squircle)' : color,
@@ -165,7 +164,7 @@ function App() {
       <Code>{`import { grid } from 'masua'
 
 grid(document.querySelector('#my-grid'))`}</Code>
-      <div ref={gridRef} style={{ position: 'relative', display: 'flex' }}>
+      <div ref={gridRef} style={{ display: 'flex' }}>
         <Box />
         <Box size={3} />
         <Box size={2} />

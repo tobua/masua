@@ -2,7 +2,7 @@
 	"compilerOptions": {
 		"strict": true,
 		"skipLibCheck": true,
-		"lib": ["DOM", "ESNext"],
+		"lib": ["DOM", "ES2020"],
 		"module": "Preserve",
 		"jsx": "react-jsx"
 	},

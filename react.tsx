@@ -1,3 +1,4 @@
+// biome-ignore lint/nursery/noUndeclaredDependencies: This is a reference to the local package.
 import { type Configuration, grid } from 'masua'
 import { type JSX, useEffect, useMemo, useRef } from 'react'
 
