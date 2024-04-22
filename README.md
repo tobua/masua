@@ -11,7 +11,7 @@ Simple masonry layout library in TypeScript. Initially forked from [minimasonry]
 
 ## Installation
 
-⚠️ This plugin is published as TypeScript and JSX (for the React plugin) see [this post on 𝕏](https://twitter.com/matthiasgiger/status/1766443368567971946) for the reasoning. Make sure to add the necessary types listed below if they are missing in your project and align your [`tsconfig.json`](https://github.com/tobua/masua/blob/main/tsconfig.json) with the reference used for this project. React is only required when the `masua/react` export is used.
+⚠️ This plugin is published as TypeScript and JSX (for the React plugin) see [this post on 𝕏](https://twitter.com/matthiasgiger/status/1766443368567971946) for the reasoning. Make sure to add the necessary types listed below if they are missing in your project and align your `tsconfig.json` with `{ compilerOptions: { lib: ['DOM', 'ES2020'], module: 'Preserve', jsx: 'react-jsx' }}` as used for this project. React is only required when the `masua/react` export is used.
 
 ```sh
 bun install masua

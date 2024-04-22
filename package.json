@@ -15,10 +15,11 @@
     "types": "tsc --noEmit"
   },
   "devDependencies": {
-    "@biomejs/biome": "^1.6.4",
-    "@types/bun": "^1.0.12",
-    "@types/react": "^18.2.78",
-    "typescript": "^5.4.5"
+    "@biomejs/biome": "^1.7.1",
+    "@types/bun": "^1.1.0",
+    "@types/react": "^18.2.79",
+    "typescript": "^5.4.5",
+    "zero-configuration": "^0.3.1"
   },
   "peerDependencies": {
     "react": ">= 18",
@@ -29,6 +30,9 @@
       "optional": true
     }
   },
+  "trustedDependencies": [
+    "zero-configuration"
+  ],
   "type": "module",
   "sideEffects": false,
   "main": "./index.ts",
@@ -58,5 +62,43 @@
   },
   "engines": {
     "node": ">= 18"
+  },
+  "configuration": {
+    "gitignore": "recommended",
+    "vscode": "recommended",
+    "typescript": {
+      "compilerOptions": {
+        "strict": true,
+        "skipLibCheck": true,
+        "lib": [
+          "DOM",
+          "ES2020"
+        ],
+        "module": "Preserve",
+        "jsx": "react-jsx"
+      },
+      "files": [
+        "index.ts",
+        "react.tsx"
+      ]
+    },
+    "biome": {
+      "extends": "recommended",
+      "linter": {
+        "rules": {
+          "nursery": {
+            "all": true
+          }
+        },
+        "ignore": [
+          "demo"
+        ]
+      },
+      "formatter": {
+        "ignore": [
+          "demo"
+        ]
+      }
+    }
   }
 }
