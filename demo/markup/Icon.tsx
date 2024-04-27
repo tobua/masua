@@ -17,6 +17,7 @@ export const Open = ({ width = 20, height = 20, color = Color.black, style = {} 
 export function Pick({ size = 20, color = Color.black }) {
   return (
     <svg style={{ width: scale(size), height: scale(size) }} viewBox="0 0 50 50">
+      <title>Pick</title>
       <path
         d="M2.5 29C2.9 29.8 14 43.6667 17 47.5L47.5 2.5"
         stroke={color}
@@ -32,20 +33,9 @@ export function Pick({ size = 20, color = Color.black }) {
 export function Close({ size = 20, color = Color.black }) {
   return (
     <svg style={{ width: scale(size), height: scale(size) }} viewBox="0 0 50 50">
-      <path
-        d="M2.5 47.5L47.5 2.5"
-        stroke={color}
-        strokeWidth="5"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-      <path
-        d="M2.5 2.5L47.5 47.5"
-        stroke={color}
-        strokeWidth="5"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
+      <title>Close</title>
+      <path d="M2.5 47.5L47.5 2.5" stroke={color} strokeWidth="5" strokeLinecap="round" strokeLinejoin="round" />
+      <path d="M2.5 2.5L47.5 47.5" stroke={color} strokeWidth="5" strokeLinecap="round" strokeLinejoin="round" />
     </svg>
   )
 }

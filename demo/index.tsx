@@ -1,18 +1,20 @@
 import { grid } from 'masua'
 import { Grid } from 'masua/react'
 import { scale } from 'optica'
-import { type CSSProperties, useEffect, useRef, useState } from 'react'
+import { type CSSProperties, useEffect, useRef, useState, type JSX } from 'react'
 import { createRoot } from 'react-dom/client'
 import { highlight } from 'sugar-high'
+import logo from '../logo.png'
 import { Configuration, ConfigurationReact } from './ConfigurationTable'
-import logo from './logo.png'
 import { Checkbox } from './markup/Checkbox'
 import { Input } from './markup/Input'
 import { Select } from './markup/Select'
 import { Color } from './style'
+import './types' // Declarations for png image.
 
 if ('paintWorklet' in CSS) {
   // Script loaded separately from /public folder after initial load.
+  // biome-ignore lint/suspicious/noExplicitAny: Experimental API, types do not exist yet.
   ;(CSS as any).paintWorklet.addModule('squircle.min.js')
 }
 
@@ -70,6 +72,7 @@ const codeStyles: CSSProperties = {
 }
 
 function Code({ children }: { children: string }) {
+  // biome-ignore lint/security/noDangerouslySetInnerHtml: Safe, as generated from static code on the client.
   return <div style={codeStyles} dangerouslySetInnerHTML={{ __html: highlight(children) }} />
 }
 

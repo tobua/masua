@@ -27,16 +27,11 @@ export function Checkbox({
   style,
   onToggle,
   ...props
-}: JSX.IntrinsicElements['input'] & { onToggle: (checked: boolean) => any }) {
+}: JSX.IntrinsicElements['input'] & { onToggle: (checked: boolean) => void }) {
   return (
     <label style={{ ...wrapperStyles, ...style }}>
       {props.checked ? <Pick /> : <Close />}
-      <input
-        type="checkbox"
-        onChange={(event) => onToggle(event.target.checked)}
-        style={{ display: 'none' }}
-        {...props}
-      />
+      <input type="checkbox" onChange={(event) => onToggle(event.target.checked)} style={{ display: 'none' }} {...props} />
       <span style={checkboxLabelStyles}>{children}</span>
     </label>
   )

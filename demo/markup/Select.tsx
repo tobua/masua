@@ -58,11 +58,7 @@ export function Select({
   return (
     <div style={inputWrapperStyles}>
       <label style={descriptionLabelStyles}>{placeholder}</label>
-      <select
-        onChange={(event) => onOption(event.target.value)}
-        {...props}
-        style={{ ...selectStyles, ...style }}
-      >
+      <select onChange={(event) => onOption(event.target.value)} {...props} style={{ ...selectStyles, ...style }}>
         {options.map((option) => (
           <option key={option.value} value={option.value}>
             {option.label}

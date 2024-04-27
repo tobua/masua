@@ -1,5 +1,5 @@
 import { scale } from 'optica'
-import { type CSSProperties, type JSX, useState } from 'react'
+import { type CSSProperties, type HTMLInputTypeAttribute, type JSX, useState } from 'react'
 import { Color } from '../style'
 
 const inputWrapperStyles: CSSProperties = {
@@ -33,7 +33,7 @@ const descriptionLabelStyles: CSSProperties = {
   whiteSpace: 'nowrap',
 }
 
-function validateValue(value: number | string, type: 'text' | 'number') {
+function validateValue(value: number | string, type: HTMLInputTypeAttribute) {
   if (typeof value === 'string') {
     const parsedValue = Number(value)
     if (!Number.isNaN(parsedValue)) {
