@@ -12,6 +12,9 @@ export const rsbuild = defineConfig({
     title: 'masua - Masonry Grid',
     favicon: '../logo.png',
   },
+  output: {
+    assetPrefix: '/masua/',
+  },
 })
 
 export const gitignore = 'recommended'
