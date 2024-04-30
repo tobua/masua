@@ -5,7 +5,7 @@ import { type CSSProperties, useEffect, useRef, useState, type JSX } from 'react
 import { createRoot } from 'react-dom/client'
 import { highlight } from 'sugar-high'
 import logo from '../logo.png'
-import { Configuration, ConfigurationReact } from './ConfigurationTable'
+import { Configuration, ConfigurationReact } from './markup/Table'
 import { Checkbox } from './markup/Checkbox'
 import { Input } from './markup/Input'
 import { Select } from './markup/Select'
@@ -166,7 +166,8 @@ function App() {
       <Heading as="h2">Usage</Heading>
       <Code>{`import { grid } from 'masua'
 
-grid(document.querySelector('#my-grid'))`}</Code>
+grid(document.querySelector('#my-grid'))
+grid(document.querySelector('#my-grid'), { baseWidth: 300, gutter: '3vw' })`}</Code>
       <div ref={gridRef} style={{ display: 'flex' }}>
         <Box />
         <Box size={3} />
@@ -178,7 +179,7 @@ grid(document.querySelector('#my-grid'))`}</Code>
       <Heading as="h3">Configuration</Heading>
       <div style={rowStyles}>
         <Input placeholder="Gutter" type="text" value={gutter} onValue={setGutter} />
-        <Input placeholder="Base Width" type="number" value={baseWidth} onValue={setBaseWidth} />
+        <Input placeholder="Base Width" type="text" value={baseWidth} onValue={setBaseWidth} />
         <Checkbox checked={minify} onToggle={setMinify}>
           Minify
         </Checkbox>
@@ -209,6 +210,12 @@ const MyGrid = () => (
     <Box />
     <Box size={6} />
     <Box size={4} />
+</Grid>
+)
+
+const MyCustomGrid = () => (
+  <Grid disabled={window.innerWidth < 501} gutterX={40} gutterY="5vw">
+    <Box />
 </Grid>
 )`}</Code>
       <Grid gutter={20}>

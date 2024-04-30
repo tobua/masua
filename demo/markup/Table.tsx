@@ -1,6 +1,6 @@
 import type { CSSProperties } from 'react'
 import { scale } from 'optica'
-import { Color } from './style'
+import { Color } from '../style'
 
 const wrapperStyles: CSSProperties = {
   display: 'grid',

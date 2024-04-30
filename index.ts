@@ -21,7 +21,7 @@ interface State {
 }
 
 export interface Configuration {
-  baseWidth: number
+  baseWidth: number | string
   gutter: number | string
   gutterX: number | string
   gutterY: number | string
@@ -33,6 +33,7 @@ export interface Configuration {
 }
 
 interface NumberConfiguration extends Configuration {
+  baseWidth: number
   gutter: number
   gutterX: number
   gutterY: number
@@ -52,7 +53,7 @@ function getCount(state: State) {
 function getLongest(state: State) {
   let longest = 0
   for (let index = 0; index < state.count; index += 1) {
-    if (state.columns[index] > state.columns[longest]) {
+    if ((state.columns[index] ?? 0) > (state.columns[longest] ?? 1)) {
       longest = index
     }
   }
@@ -66,7 +67,7 @@ function getNextColumn(index: number, state: State) {
 function getShortest(state: State) {
   let shortest = 0
   for (let index = 0; index < state.count; index += 1) {
-    if (state.columns[index] < state.columns[shortest]) {
+    if ((state.columns[index] ?? 1) < (state.columns[shortest] ?? 0)) {
       shortest = index
     }
   }
@@ -174,15 +175,15 @@ function layout(state: State) {
     } else {
       x = startX - (colWidth + childrenGutter) * nextColumn - colWidth
     }
-    const y = state.columns[nextColumn]
+    const y = state.columns[nextColumn] ?? 0
     const child = children[index] as HTMLElement
     child.style.transform = `translate3d(${Math.round(x)}px,${Math.round(y)}px,0)`
     child.style.position = 'absolute'
 
-    state.columns[nextColumn] += state.sizes[index] + (state.count > 1 ? state.gutterY : state.singleColumnGutter) // margin-bottom
+    state.columns[nextColumn] += (state.sizes[index] ?? 0) + (state.count > 1 ? state.gutterY : state.singleColumnGutter) // margin-bottom
   }
 
-  state.container.style.height = `${state.columns[getLongest(state)] - state.currentGutterY}px`
+  state.container.style.height = `${(state.columns[getLongest(state)] ?? 0) - state.currentGutterY}px`
 }
 
 function resizeThrottler(state: State) {
@@ -257,13 +258,14 @@ function getSizeInPixels(size: string) {
   return pixels
 }
 
-const sizeValues: (keyof Configuration)[] = ['gutter', 'gutterX', 'gutterY', 'singleColumnGutter']
+const sizeValues: (keyof Configuration)[] = ['baseWidth', 'gutter', 'gutterX', 'gutterY', 'singleColumnGutter']
 
 function convertStringSizesToPixels(configuration: Partial<Configuration>): Partial<NumberConfiguration> {
   for (const property of sizeValues) {
     const value = configuration[property]
     if (typeof value === 'string') {
-      configuration.gutter = getSizeInPixels(value)
+      // @ts-ignore No idea what's the issue here.
+      configuration[property] = getSizeInPixels(value)
     }
   }
 

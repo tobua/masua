@@ -43,7 +43,7 @@ grid(document.querySelector('#my-custom-grid'), {
 import { Grid } from 'masua/react'
 
 const MyGrid = () => (
-  <Grid disabled={window.innerWidth < 501}>
+  <Grid disabled={window.innerWidth < 501} gutter={50}>
     <Box />
     <Box size={3} />
     <Box size={2} />
