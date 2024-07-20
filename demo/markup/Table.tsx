@@ -1,5 +1,5 @@
-import type { CSSProperties } from 'react'
 import { scale } from 'optica'
+import type { CSSProperties } from 'react'
 import { Color } from '../style'
 
 const wrapperStyles: CSSProperties = {

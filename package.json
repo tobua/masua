@@ -10,16 +10,15 @@
     "Spope (minimasonry)"
   ],
   "scripts": {
-    "format": "bun biome format . --write",
-    "lint": "bun biome lint .",
+    "check": "biome check --write .",
     "types": "tsc"
   },
   "devDependencies": {
-    "@biomejs/biome": "^1.7.1",
-    "@types/bun": "^1.1.1",
-    "@types/react": "^18.3.1",
-    "typescript": "^5.4.5",
-    "zero-configuration": "^0.6.0"
+    "@biomejs/biome": "^1.8.3",
+    "@types/bun": "^1.1.6",
+    "@types/react": "^18.3.3",
+    "typescript": "^5.5.3",
+    "zero-configuration": "^0.17.0"
   },
   "peerDependencies": {
     "react": ">= 18",
@@ -66,6 +65,13 @@
   "configuration": {
     "gitignore": "bundle",
     "vscode": "biome",
+    "license": {
+      "extends": "MIT",
+      "authors": [
+        { "name": "Matthias Giger"},
+        { "name": "Spope", "year": "2017"}
+      ]
+    },
     "typescript": {
       "extends": "plugin",
       "compilerOptions": {
@@ -78,13 +84,6 @@
     },
     "biome": {
       "extends": "recommended",
-      "linter": {
-        "rules": {
-          "nursery": {
-            "all": true
-          }
-        }
-      },
       "files": {
         "ignore": [
           "demo"

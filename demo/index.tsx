@@ -1,14 +1,14 @@
 import { grid } from 'masua'
 import { Grid } from 'masua/react'
 import { scale } from 'optica'
-import { type CSSProperties, useEffect, useRef, useState, type JSX } from 'react'
+import { type CSSProperties, type JSX, useEffect, useRef, useState } from 'react'
 import { createRoot } from 'react-dom/client'
 import { highlight } from 'sugar-high'
 import logo from '../logo.png'
-import { Configuration, ConfigurationReact } from './markup/Table'
 import { Checkbox } from './markup/Checkbox'
 import { Input } from './markup/Input'
 import { Select } from './markup/Select'
+import { Configuration, ConfigurationReact } from './markup/Table'
 import { Color } from './style'
 import './types' // Declarations for png image.
 

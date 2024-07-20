@@ -180,7 +180,9 @@ function layout(state: State) {
     child.style.transform = `translate3d(${Math.round(x)}px,${Math.round(y)}px,0)`
     child.style.position = 'absolute'
 
-    state.columns[nextColumn] += (state.sizes[index] ?? 0) + (state.count > 1 ? state.gutterY : state.singleColumnGutter) // margin-bottom
+    if (state.columns[nextColumn]) {
+      state.columns[nextColumn] += (state.sizes[index] ?? 0) + (state.count > 1 ? state.gutterY : state.singleColumnGutter) // margin-bottom
+    }
   }
 
   state.container.style.height = `${(state.columns[getLongest(state)] ?? 0) - state.currentGutterY}px`

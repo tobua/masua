@@ -1,7 +1,7 @@
 import { scale } from 'optica'
 import type { CSSProperties, JSX } from 'react'
 import { Color } from '../style'
-import { Pick, Close } from './Icon'
+import { Close, Pick } from './Icon'
 
 const wrapperStyles: CSSProperties = {
   background: Color.blue.ultralight,

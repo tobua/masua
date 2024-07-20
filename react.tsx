@@ -1,6 +1,5 @@
-// biome-ignore lint/nursery/noUndeclaredDependencies: This is a reference to the local package.
 import { type Configuration, grid } from 'masua'
-import { type JSX, useEffect, useMemo, useRef } from 'react'
+import { type JSX, useEffect, useRef } from 'react'
 
 interface ReactConfiguration extends Configuration {
   disabled: boolean
@@ -21,18 +20,15 @@ const configurationProperties = [
 export function Grid({ disabled = false, children, ...props }: JSX.IntrinsicElements['div'] & Partial<ReactConfiguration>) {
   const gridRef = useRef(null)
   const instance = useRef<ReturnType<typeof grid> | null>(null)
-  const configurationProps = useMemo(
-    () =>
-      Object.entries(props).reduce((result: { [key: string]: string }, [key, value]) => {
-        if (configurationProperties.includes(key)) {
-          result[key] = value
-          // @ts-ignore
-          delete props[key]
-        }
-        return result
-      }, {}),
-    [props],
-  )
+  // TODO props changes on every render, cannot be memoized, should do deep compare.
+  const configurationProps = Object.entries(props).reduce((result: { [key: string]: string }, [key, value]) => {
+    if (configurationProperties.includes(key)) {
+      result[key] = value
+      // @ts-ignore
+      delete props[key]
+    }
+    return result
+  }, {})
 
   useEffect(() => {
     if (disabled) {
