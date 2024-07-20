@@ -182,6 +182,8 @@ function layout(state: State) {
 
     if (state.columns[nextColumn]) {
       state.columns[nextColumn] += (state.sizes[index] ?? 0) + (state.count > 1 ? state.gutterY : state.singleColumnGutter) // margin-bottom
+    } else {
+      state.columns[nextColumn] = (state.sizes[index] ?? 0) + (state.count > 1 ? state.gutterY : state.singleColumnGutter) // margin-bottom
     }
   }
 
