@@ -31,6 +31,7 @@ export const biome = {
       },
     },
   },
+  root: false,
   files: {
     includes: ['**/*', '!public/**'],
   },
