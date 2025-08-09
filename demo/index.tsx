@@ -1,11 +1,11 @@
 import { grid } from 'masua'
 import { Grid } from 'masua/react'
 import { scale } from 'optica'
-import { type CSSProperties, type JSX, useEffect, useRef, useState } from 'react'
+import { type CSSProperties, useEffect, useRef, useState } from 'react'
 import { createRoot } from 'react-dom/client'
-import { highlight } from 'sugar-high'
 import logo from '../logo.png'
 import { Checkbox } from './markup/Checkbox'
+import { Box, Code, Heading, Paragraph } from './markup/Components'
 import { Input } from './markup/Input'
 import { Select } from './markup/Select'
 import { Configuration, ConfigurationReact } from './markup/Table'
@@ -34,27 +34,6 @@ const appStyles: CSSProperties = {
   gap: scale(20),
 }
 
-const headingSize = { h1: scale(36), h2: scale(26), h3: scale(22) }
-
-const headingStyles = (as: 'h1' | 'h2' | 'h3'): CSSProperties => ({
-  margin: 0,
-  fontSize: headingSize[as],
-})
-
-function Heading({ as = 'h1', style, ...props }: JSX.IntrinsicElements['h1' | 'h2' | 'h3'] & { as?: 'h1' | 'h2' | 'h3' }) {
-  const Component = as
-  return <Component {...props} style={{ ...headingStyles(as), ...style }} />
-}
-
-const paragraphStyles: CSSProperties = {
-  margin: 0,
-  fontSize: scale(18),
-}
-
-function Paragraph({ style, ...props }: JSX.IntrinsicElements['p']) {
-  return <p {...props} style={{ ...paragraphStyles, ...style }} />
-}
-
 const rowStyles: CSSProperties = {
   display: 'flex',
   gap: scale(20),
@@ -62,41 +41,7 @@ const rowStyles: CSSProperties = {
   flexWrap: 'wrap',
 }
 
-const codeStyles: CSSProperties = {
-  display: 'flex',
-  flexDirection: 'column',
-  padding: scale(20),
-  background: Color.blue.ultralight,
-  borderRadius: scale(20),
-  fontFamily: 'monospace',
-}
-
-function Code({ children }: { children: string }) {
-  // biome-ignore lint/security/noDangerouslySetInnerHtml: Safe, as generated from static code on the client.
-  return <div style={codeStyles} dangerouslySetInnerHTML={{ __html: highlight(children) }} />
-}
-
-let colorIndex = 0
-
-const boxStyles = (size: number, sizeFactor = 40): CSSProperties => {
-  const color = Color.boxes[colorIndex++ % 6]
-
-  return {
-    width: scale(100),
-    height: scale(size * sizeFactor),
-    background: 'paintWorklet' in CSS ? 'paint(squircle)' : color,
-    borderRadius: 'paintWorklet' in CSS ? 0 : scale(10),
-    // @ts-ignore
-    '--squircle-radius': sizeFactor / 2,
-    '--squircle-fill': color,
-  }
-}
-
-function Box({ size = 1 }) {
-  return <div style={boxStyles(size)} />
-}
-
-function App() {
+export function App() {
   const gridRef = useRef(null)
   const gridInstance = useRef<ReturnType<typeof grid>>(null)
   const [gutter, setGutter] = useState<number | string>(10)

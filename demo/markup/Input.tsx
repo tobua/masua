@@ -1,5 +1,5 @@
 import { scale } from 'optica'
-import { type CSSProperties, type HTMLInputTypeAttribute, type JSX, useState } from 'react'
+import { type CSSProperties, type HTMLInputTypeAttribute, type JSX, useId, useState } from 'react'
 import { Color } from '../style'
 
 const inputWrapperStyles: CSSProperties = {
@@ -75,11 +75,15 @@ export function Input({
   const [displayValue, setDisplayValue] = useState(value)
   const [valid, setValid] = useState(true)
   const debouncedOnValue = customDebounce(onValue, 500)
+  const inputId = useId()
 
   return (
     <div style={inputWrapperStyles}>
-      <label style={descriptionLabelStyles}>{placeholder}</label>
+      <label style={descriptionLabelStyles} htmlFor={inputId}>
+        {placeholder}
+      </label>
       <input
+        id={inputId}
         type="number"
         value={displayValue}
         onChange={(event) => {

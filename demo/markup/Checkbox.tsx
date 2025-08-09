@@ -27,7 +27,7 @@ export function Checkbox({
   style,
   onToggle,
   ...props
-}: JSX.IntrinsicElements['input'] & { onToggle: (checked: boolean) => void }) {
+}: Omit<JSX.IntrinsicElements['input'], 'onToggle'> & { onToggle: (checked: boolean) => void }) {
   return (
     <label style={{ ...wrapperStyles, ...style }}>
       {props.checked ? <Pick /> : <Close />}

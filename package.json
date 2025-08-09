@@ -14,11 +14,11 @@
     "types": "tsc"
   },
   "devDependencies": {
-    "@biomejs/biome": "^1.8.3",
-    "@types/bun": "^1.1.6",
-    "@types/react": "^18.3.3",
-    "typescript": "^5.5.3",
-    "zero-configuration": "^0.17.0"
+    "@biomejs/biome": "^2.1.4",
+    "@types/bun": "^1.2.19",
+    "@types/react": "^19.1.9",
+    "typescript": "^5.9.2",
+    "zero-configuration": "^1.0.5"
   },
   "peerDependencies": {
     "react": ">= 18",
@@ -68,8 +68,13 @@
     "license": {
       "extends": "MIT",
       "authors": [
-        { "name": "Matthias Giger"},
-        { "name": "Spope", "year": "2017"}
+        {
+          "name": "Matthias Giger"
+        },
+        {
+          "name": "Spope",
+          "year": "2017"
+        }
       ]
     },
     "typescript": {
@@ -85,8 +90,9 @@
     "biome": {
       "extends": "recommended",
       "files": {
-        "ignore": [
-          "demo"
+        "includes": [
+          "**/*",
+          "!demo/**"
         ]
       }
     }

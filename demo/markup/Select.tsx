@@ -1,5 +1,6 @@
 import { scale } from 'optica'
 import type { CSSProperties, JSX } from 'react'
+import { useId } from 'react'
 import { Color } from '../style'
 import { Open } from './Icon'
 
@@ -55,10 +56,14 @@ export function Select({
   onOption: (option: string) => void
   placeholder: string
 }) {
+  const selectId = useId()
+
   return (
     <div style={inputWrapperStyles}>
-      <label style={descriptionLabelStyles}>{placeholder}</label>
-      <select onChange={(event) => onOption(event.target.value)} {...props} style={{ ...selectStyles, ...style }}>
+      <label style={descriptionLabelStyles} htmlFor={selectId}>
+        {placeholder}
+      </label>
+      <select id={selectId} onChange={(event) => onOption(event.target.value)} {...props} style={{ ...selectStyles, ...style }}>
         {options.map((option) => (
           <option key={option.value} value={option.value}>
             {option.label}

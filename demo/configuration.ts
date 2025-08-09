@@ -26,10 +26,13 @@ export const biome = {
       style: {
         useFilenamingConvention: 'off',
       },
+      correctness: {
+        noUndeclaredDependencies: 'off',
+      },
     },
   },
   files: {
-    ignore: ['public', 'rsbuild.config.ts'],
+    includes: ['**/*', '!public/**'],
   },
 }
 

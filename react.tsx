@@ -1,5 +1,6 @@
 import { type Configuration, grid } from 'masua'
-import { type JSX, useEffect, useRef } from 'react'
+import type React from 'react'
+import { useEffect, useRef } from 'react'
 
 interface ReactConfiguration extends Configuration {
   disabled: boolean
@@ -17,11 +18,11 @@ const configurationProperties = [
   'wedge',
 ]
 
-export function Grid({ disabled = false, children, ...props }: JSX.IntrinsicElements['div'] & Partial<ReactConfiguration>) {
+export function Grid({ disabled = false, children, ...props }: React.JSX.IntrinsicElements['div'] & Partial<ReactConfiguration>) {
   const gridRef = useRef(null)
   const instance = useRef<ReturnType<typeof grid> | null>(null)
   // TODO props changes on every render, cannot be memoized, should do deep compare.
-  const configurationProps = Object.entries(props).reduce((result: { [key: string]: string }, [key, value]) => {
+  const configurationProps = Object.entries(props).reduce((result: { [resultKey: string]: string }, [key, value]) => {
     if (configurationProperties.includes(key)) {
       result[key] = value
       // @ts-ignore

@@ -40,6 +40,7 @@ interface NumberConfiguration extends Configuration {
   singleColumnGutter: number
 }
 
+// biome-ignore lint/suspicious/noConsole: User feedback.
 const log = (message: string, type: 'log' | 'error' = 'log') => console[type](`masua: ${message}.`)
 
 function getCount(state: State) {
