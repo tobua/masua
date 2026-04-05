@@ -71,7 +71,7 @@ export function Input({
   onValue,
   placeholder,
   ...props
-}: JSX.IntrinsicElements['input'] & { onValue: ((value: number) => void) | ((value: number | string) => void) }) {
+}: JSX.IntrinsicElements['input'] & { onValue: (value: number | string) => void }) {
   const [displayValue, setDisplayValue] = useState(value)
   const [valid, setValid] = useState(true)
   const debouncedOnValue = customDebounce(onValue, 500)
@@ -89,7 +89,7 @@ export function Input({
         onChange={(event) => {
           const newValue = event.target.value
           setDisplayValue(newValue)
-          const validValue = validateValue(newValue, props.type)
+          const validValue = validateValue(newValue, props.type ?? 'text')
           if (!validValue) {
             setValid(false)
             return

@@ -11,10 +11,14 @@
   ],
   "scripts": {
     "check": "biome check --write .",
-    "types": "tsc"
+    "types": "tsc && tsc --project ./test/tsconfig.json"
   },
+  "workspaces": [
+    "demo"
+  ],
   "devDependencies": {
     "@biomejs/biome": "^2.1.4",
+    "@happy-dom/global-registrator": "^20.8.9",
     "@types/bun": "^1.2.19",
     "@types/react": "^19.1.9",
     "typescript": "^5.9.2",
@@ -22,7 +26,7 @@
   },
   "peerDependencies": {
     "react": ">= 18",
-    "typescript": ">= 5"
+    "typescript": ">= 6"
   },
   "peerDependenciesMeta": {
     "react": {
@@ -31,9 +35,6 @@
   },
   "trustedDependencies": [
     "zero-configuration"
-  ],
-  "workspaces": [
-    "demo"
   ],
   "type": "module",
   "sideEffects": false,
@@ -77,16 +78,31 @@
         }
       ]
     },
-    "typescript": {
-      "extends": "plugin",
-      "compilerOptions": {
-        "jsx": "react-jsx"
+    "typescript": [
+      {
+        "extends": "plugin",
+        "compilerOptions": {
+          "jsx": "react-jsx"
+        },
+        "files": [
+          "index.ts",
+          "react.tsx"
+        ]
       },
-      "files": [
-        "index.ts",
-        "react.tsx"
-      ]
-    },
+      {
+        "extends": "web",
+        "folder": "test",
+        "compilerOptions": {
+          "types": [
+            "bun",
+            "react"
+          ]
+        },
+        "includes": [
+          "*.test.tsx"
+        ]
+      }
+    ],
     "biome": {
       "extends": "recommended",
       "files": {

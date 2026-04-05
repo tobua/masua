@@ -40,7 +40,6 @@ export const biome = {
 export const typescript = {
   compilerOptions: {
     skipLibCheck: true,
-    baseUrl: '.',
     target: 'ESNext',
     lib: ['DOM', 'ESNext'],
     module: 'Preserve',

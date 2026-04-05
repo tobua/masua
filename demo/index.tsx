@@ -63,6 +63,9 @@ export function App() {
       })
       return gridInstance.current.destroy
     }
+    if (!gridRef.current) {
+      return
+    }
     gridInstance.current = grid(gridRef.current, {
       gutter,
       baseWidth,
@@ -71,7 +74,7 @@ export function App() {
       surroundingGutter,
       wedge,
     })
-    return gridInstance.current.destroy
+    return gridInstance.current?.destroy
   }, [gutter, baseWidth, direction, minify, surroundingGutter, wedge])
 
   return (
@@ -123,8 +126,8 @@ grid(document.querySelector('#my-grid'), { baseWidth: 300, gutter: '3vw' })`}</C
       </div>
       <Heading as="h3">Configuration</Heading>
       <div style={rowStyles}>
-        <Input placeholder="Gutter" type="text" value={gutter} onValue={setGutter} />
-        <Input placeholder="Base Width" type="text" value={baseWidth} onValue={setBaseWidth} />
+        <Input placeholder="Gutter" type="text" value={gutter} onValue={(value) => setGutter(Number(value))} />
+        <Input placeholder="Base Width" type="text" value={baseWidth} onValue={(value) => setBaseWidth(Number(value))} />
         <Checkbox checked={minify} onToggle={setMinify}>
           Minify
         </Checkbox>
@@ -133,7 +136,7 @@ grid(document.querySelector('#my-grid'), { baseWidth: 300, gutter: '3vw' })`}</C
         </Checkbox>
         <Select
           placeholder="Direction"
-          onOption={(option: 'ltr' | 'rtl') => setDirection(option)}
+          onOption={(option) => setDirection(option as 'ltr' | 'rtl')}
           options={[
             { label: 'Left to Right', value: 'ltr' },
             { label: 'Right to Left', value: 'rtl' },
